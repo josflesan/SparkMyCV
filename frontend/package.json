@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "build_schema": "cd ../backend && pdm run build_schema && cp -r ../backend/schema.json ../frontend/src/schema.json && cd ../frontend && npx openapi-generator-cli generate -i src/schema.json -g typescript-axios -o src/api",
+    "build_schema": "cd ../backend && pdm run build_schema && pdm install && cp -r ../backend/schema.json ../frontend/src/schema.json && cd ../frontend && npx openapi-generator-cli generate -i src/schema.json -g typescript-axios -o src/api",
     "dev": "npm run build_schema && vite dev"
   },
   "dependencies": {
