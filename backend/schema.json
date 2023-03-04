@@ -28,7 +28,7 @@
                             "application/json": {
                                 "schema": {
                                     "title": "Response Upload File Upload Post",
-                                    "type": "string"
+                                    "type": "object"
                                 }
                             }
                         }
@@ -49,7 +49,7 @@
         "/file/{file_hash}": {
             "get": {
                 "summary": "Check File Exists",
-                "description": "Method that checks whether a file exists in the server filestore\nby using its hash.\n\nParameters:\n    file_hash (str): the SHA256 hash of the file's name as Hex\n\nReturns:\n    response (str): JSON string output with single 'response' key with Boolean value representing file existence",
+                "description": "Method that checks whether a file exists in the server filestore\nby using its hash.\n\nParameters:\n    file_hash (str): the SHA256 hash of the file's name as Hex\n\nReturns:\n    response (dict): JSON output with single 'response' key with Boolean value representing file existence",
                 "operationId": "check_file_exists_file__file_hash__get",
                 "parameters": [
                     {
@@ -69,7 +69,7 @@
                             "application/json": {
                                 "schema": {
                                     "title": "Response Check File Exists File  File Hash  Get",
-                                    "type": "string"
+                                    "type": "object"
                                 }
                             }
                         }
@@ -92,26 +92,16 @@
                 "summary": "Enhance Cv",
                 "description": "Method that takes in a file hash (as hex SHA256 output) and a job posting URL and returns an enhanced version\nof the URL tailored for the job posting.\n\nParameters:\n    file_hash (str): A hash representation (SHA256) of the desired file's name\n    job_posting_url (str): A url pointing to the desired job posting\n\nReturns:\n    result (dict): result JSON with MarkDown format of enhanced CV",
                 "operationId": "enhance_cv_enhance_post",
-                "parameters": [
-                    {
-                        "required": true,
-                        "schema": {
-                            "title": "File Hash",
-                            "type": "string"
-                        },
-                        "name": "file_hash",
-                        "in": "query"
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EnhanceBody"
+                            }
+                        }
                     },
-                    {
-                        "required": true,
-                        "schema": {
-                            "title": "Job Posting Url",
-                            "type": "string"
-                        },
-                        "name": "job_posting_url",
-                        "in": "query"
-                    }
-                ],
+                    "required": true
+                },
                 "responses": {
                     "200": {
                         "description": "Successful Response",
@@ -119,7 +109,7 @@
                             "application/json": {
                                 "schema": {
                                     "title": "Response Enhance Cv Enhance Post",
-                                    "type": "string"
+                                    "type": "object"
                                 }
                             }
                         }
@@ -151,6 +141,24 @@
                         "title": "Cv File",
                         "type": "string",
                         "format": "binary"
+                    }
+                }
+            },
+            "EnhanceBody": {
+                "title": "EnhanceBody",
+                "required": [
+                    "file_hash",
+                    "job_posting_url"
+                ],
+                "type": "object",
+                "properties": {
+                    "file_hash": {
+                        "title": "File Hash",
+                        "type": "string"
+                    },
+                    "job_posting_url": {
+                        "title": "Job Posting Url",
+                        "type": "string"
                     }
                 }
             },
