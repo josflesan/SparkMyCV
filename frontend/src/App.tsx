@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import Upload from './components/Upload';
 import { Configuration, DefaultApi } from './api';
-import { APIProvider } from './APIProvider';
+import { APIProvider, useAPI } from './APIProvider';
 
 export type ModifiedCV = {
     company: string,
@@ -18,6 +18,36 @@ export type ModifiedCVState = {
 
 export type CVs = {
 	[id: number]: ModifiedCVState
+}
+
+export function useCVs() {
+	// setOriginalCV - set the CV PDF to be processed
+	// addRequest - adds a request / pending CV to the list
+    // removeCV - removes a CV from the list regardless of state
+    // setProcessedCV - assigns a processed CV to a pending CV
+    // setErrorCV - assigns an error to a pending CV
+	const api = useAPI();
+	const cvRef = useRef<CVs>({});
+	const [cvs, setCvs] = useState<CVs>({});
+	const nextIDRef = useRef(0);
+
+	const setOriginalCV = useCallback((file: File | null) => {
+		if (file) {
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				if (e.target) {
+					const data = e.target.result;
+					if (data) {
+						// api.uploadCV(data as string).then((response) => {
+						// 	console.log(response);
+						// });
+					}
+				}
+			}
+			reader.readAsDataURL(file);
+		}
+	}, [api]);
+
 }
 
 function App() {
