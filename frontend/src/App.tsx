@@ -41,12 +41,26 @@ export function useCVs() {
 	const nextIDRef = useRef(0);
 
 	const setOriginalCV = useCallback(async (file: File | null) => {
-		if (file) {
-			// Get the SHA256 hash of the file
-			const hash = await calculateSHA256(file);
-			// See if the server has this file already
-			const hasFileResponse = await api.checkFileExistsFileFileHashGet(hash);
-			console.log(hasFileResponse);
+		if (api !== null) {
+			if (file) {
+				// Get the SHA256 hash of the file
+				const hash = await calculateSHA256(file);
+				// See if the server has this file already
+				const hasFileResponse = await api.checkFileExistsFileFileHashGet(hash);
+				console.log(hasFileResponse);
+				// Parse response
+				const response = JSON.parse(hasFileResponse.data);
+				// Throw error if response.response is not a boolean
+				if (typeof response.response !== "boolean") {
+					throw new Error("Invalid response from server");
+				}
+				// If the server has the file, thats good
+				// If the server doesn't have the file, upload it
+				if (!response.response) {
+					const uploadResponse = await api.uploadDataUploadPost(file);
+					console.log(uploadResponse);
+				}
+			}
 		}
 	}, [api]);
 	return {
