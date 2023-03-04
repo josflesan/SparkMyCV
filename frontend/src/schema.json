@@ -8,14 +8,14 @@
     "paths": {
         "/upload": {
             "post": {
-                "summary": "Upload Data",
+                "summary": "Upload File",
                 "description": "Method that gets CV file as a pdf/text file and stores it in\nserver's memory.\n\nParameters:\n    cv_file (UploadFile): A CV file as a PDF/.txt\n\nReturns:\n    response (str): JSON string output containing the file hash",
-                "operationId": "upload_data_upload_post",
+                "operationId": "upload_file_upload_post",
                 "requestBody": {
                     "content": {
                         "multipart/form-data": {
                             "schema": {
-                                "$ref": "#/components/schemas/Body_upload_data_upload_post"
+                                "$ref": "#/components/schemas/Body_upload_file_upload_post"
                             }
                         }
                     },
@@ -27,7 +27,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "title": "Response Upload Data Upload Post",
+                                    "title": "Response Upload File Upload Post",
                                     "type": "string"
                                 }
                             }
@@ -49,7 +49,7 @@
         "/file/{file_hash}": {
             "get": {
                 "summary": "Check File Exists",
-                "description": "Method that checks whether a file exists in the server filestore\nby using its hash.\n\nParameters:\n    file_hash (str): the SHA256 hash of the file's name\n\nReturns:\n    response (str): JSON string output with single 'response' key with Boolean value representing file existence",
+                "description": "Method that checks whether a file exists in the server filestore\nby using its hash.\n\nParameters:\n    file_hash (str): the SHA256 hash of the file's name as Hex\n\nReturns:\n    response (str): JSON string output with single 'response' key with Boolean value representing file existence",
                 "operationId": "check_file_exists_file__file_hash__get",
                 "parameters": [
                     {
@@ -90,7 +90,7 @@
         "/enhance": {
             "post": {
                 "summary": "Enhance Cv",
-                "description": "Method that takes in a file hash and a job posting URL and returns an enhanced version\nof the URL tailored for the job posting.\n\nParameters:\n    file_hash (str): A hash representation (SHA256) of the desired file's name\n    job_posting_url (str): A url pointing to the desired job posting\n\nReturns:\n    result (dict): result JSON with MarkDown format of enhanced CV",
+                "description": "Method that takes in a file hash (as hex SHA256 output) and a job posting URL and returns an enhanced version\nof the URL tailored for the job posting.\n\nParameters:\n    file_hash (str): A hash representation (SHA256) of the desired file's name\n    job_posting_url (str): A url pointing to the desired job posting\n\nReturns:\n    result (dict): result JSON with MarkDown format of enhanced CV",
                 "operationId": "enhance_cv_enhance_post",
                 "parameters": [
                     {
@@ -119,7 +119,7 @@
                             "application/json": {
                                 "schema": {
                                     "title": "Response Enhance Cv Enhance Post",
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -140,8 +140,8 @@
     },
     "components": {
         "schemas": {
-            "Body_upload_data_upload_post": {
-                "title": "Body_upload_data_upload_post",
+            "Body_upload_file_upload_post": {
+                "title": "Body_upload_file_upload_post",
                 "required": [
                     "cv_file"
                 ],

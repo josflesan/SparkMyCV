@@ -1,4 +1,4 @@
-from .cvFormatter import CVFormatter
+from cvFormatter import CVFormatter
 from typing import List
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -52,7 +52,7 @@ async def upload_file(cv_file: UploadFile) -> str:
     finally:
         cv_file.file.close()
 
-    return json.dumps({"response": "File uploaded correctly"})
+    return json.dumps({"response": "File uploaded correctly", "hash": filename_hash})
 
 @app.get("/file/{file_hash}")
 async def check_file_exists(file_hash: str) -> str:

@@ -20,14 +20,6 @@ export type CVs = {
 	[id: number]: ModifiedCVState
 }
 
-async function calculateSHA256(file: File): Promise<string> {
-	const buffer = await file.arrayBuffer();
-	const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-	const hashArray = Array.from(new Uint8Array(hashBuffer));
-	const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-	return hashHex;
-}
-
 export function useCVs() {
 	// setOriginalCV - set the CV PDF to be processed
 	// addRequest - adds a request / pending CV to the list
@@ -35,7 +27,8 @@ export function useCVs() {
     // setProcessedCV - assigns a processed CV to a pending CV
     // setErrorCV - assigns an error to a pending CV
 	const api = useAPI();
-	const cvRef = useRef<CVs>({});
+	const [originalCV, _setOriginalCV] = useState<File|null>(null);
+	const currentHashRef = useRef<string|null>(null);
 	const cvHashRef = useRef<string|null>(null);
 	const [cvs, setCvs] = useState<CVs>({});
 	const nextIDRef = useRef(0);
@@ -44,28 +37,34 @@ export function useCVs() {
 		if (api !== null) {
 			if (file) {
 				// Get the SHA256 hash of the file
-				const hash = await calculateSHA256(file);
 				// See if the server has this file already
-				const hasFileResponse = await api.checkFileExistsFileFileHashGet(hash);
-				console.log(hasFileResponse);
-				// Parse response
-				const response = JSON.parse(hasFileResponse.data);
-				// Throw error if response.response is not a boolean
-				if (typeof response.response !== "boolean") {
-					throw new Error("Invalid response from server");
+				let needsUpload = true;
+				if (currentHashRef.current !== null) {
+					const hasFileResponse = await api.checkFileExistsFileFileHashGet(currentHashRef.current);
+					const response = JSON.parse(hasFileResponse.data);
+					// Throw error if response.response is not a boolean
+					if (typeof response.response !== "boolean") {
+						throw new Error("Invalid response from server");
+					}
+					if (response.response) {
+						needsUpload = false;
+					}
 				}
-				// If the server has the file, thats good
-				// If the server doesn't have the file, upload it
-				if (!response.response) {
-					const uploadResponse = await api.uploadDataUploadPost(file);
+				if (needsUpload) {
+					const uploadResponse = await api.uploadFileUploadPost(file);
 					console.log(uploadResponse);
+					_setOriginalCV(file);
 				}
+			} else {
+				_setOriginalCV(null);
+				currentHashRef.current = null;
 			}
 		}
-	}, [api]);
+	}, [api, _setOriginalCV]);
 	return {
 		cvs,
-		setOriginalCV
+		setOriginalCV,
+		originalCV
 	}
 }
 
@@ -104,7 +103,6 @@ function App() {
 			error: "some error"
 		}
 	});
-	const {setOriginalCV} = useCVs();
 	return (
 		<APIProvider url='http://localhost:8020'>
 			<AppContextProvider>

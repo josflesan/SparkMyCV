@@ -31,29 +31,41 @@ function JobURL({url, id, removeUrl}: {url: string, id: number, removeUrl: (id: 
 }
 
 function FileUploader() {
-    const {setOriginalCV} = useContext(AppContext);
-    return <div className="">
-        <Dropzone onDrop={(files: File[]) => {
-            if (files.length > 0) {
-                setOriginalCV(files[0]);
-            }
-            console.log(files);
-        }}>
-            {({ getRootProps, getInputProps }) => (
-                // Center all content
-                <div className="container p-8 cursor-pointer hover-border">
-                    <div
-                        {...getRootProps({
-                            className: 'dropzone',
-                            onDrop: event => event.stopPropagation()
-                        })}
-                    >
-                        <input {...getInputProps()} />
-                        <p>Drop your CV here ↓</p>
-                    </div>
+    const {setOriginalCV, originalCV} = useContext(AppContext);
+    return <div className="container p-8 cursor-pointer hover-border">
+        {
+            originalCV ? (
+                <div onClick={()=>{
+                    console.log("Clicked");
+                    setOriginalCV(null);
+                }}>
+                    CV uploaded. Click to change.
                 </div>
-            )}
-        </Dropzone>
+            ) :
+            (
+                <Dropzone onDrop={(files: File[]) => {
+                    if (files.length > 0) {
+                        setOriginalCV(files[0]);
+                    }
+                    console.log(files);
+                }}>
+                    {({ getRootProps, getInputProps }) => (
+                        // Center all content
+                        <div className="">
+                            <div
+                                {...getRootProps({
+                                    className: 'dropzone',
+                                    onDrop: event => event.stopPropagation()
+                                })}
+                            >
+                                <input {...getInputProps()} />
+                                <p>Drop your CV here ↓</p>
+                            </div>
+                        </div>
+                    )}
+                </Dropzone>
+            )
+        }
     </div>;
 }
 

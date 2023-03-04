@@ -76,7 +76,7 @@ export interface ValidationError {
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Method that checks whether a file exists in the server filestore by using its hash.  Parameters:     file_hash (str): the SHA256 hash of the file\'s name  Returns:     response (str): JSON string output with single \'response\' key with Boolean value representing file existence
+         * Method that checks whether a file exists in the server filestore by using its hash.  Parameters:     file_hash (str): the SHA256 hash of the file\'s name as Hex  Returns:     response (str): JSON string output with single \'response\' key with Boolean value representing file existence
          * @summary Check File Exists
          * @param {string} fileHash 
          * @param {*} [options] Override http request option.
@@ -110,7 +110,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Method that takes in a file hash and a job posting URL and returns an enhanced version of the URL tailored for the job posting.  Parameters:     file_hash (str): A hash representation (SHA256) of the desired file\'s name     job_posting_url (str): A url pointing to the desired job posting  Returns:     result (dict): result JSON with MarkDown format of enhanced CV
+         * Method that takes in a file hash (as hex SHA256 output) and a job posting URL and returns an enhanced version of the URL tailored for the job posting.  Parameters:     file_hash (str): A hash representation (SHA256) of the desired file\'s name     job_posting_url (str): A url pointing to the desired job posting  Returns:     result (dict): result JSON with MarkDown format of enhanced CV
          * @summary Enhance Cv
          * @param {string} fileHash 
          * @param {string} jobPostingUrl 
@@ -155,14 +155,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * Method that gets CV file as a pdf/text file and stores it in server\'s memory.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt  Returns:     response (str): JSON string output containing the file hash
-         * @summary Upload Data
+         * @summary Upload File
          * @param {File} cvFile 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        uploadDataUploadPost: async (cvFile: File, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        uploadFileUploadPost: async (cvFile: File, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'cvFile' is not null or undefined
-            assertParamExists('uploadDataUploadPost', 'cvFile', cvFile)
+            assertParamExists('uploadFileUploadPost', 'cvFile', cvFile)
             const localVarPath = `/upload`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -205,7 +205,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
         /**
-         * Method that checks whether a file exists in the server filestore by using its hash.  Parameters:     file_hash (str): the SHA256 hash of the file\'s name  Returns:     response (str): JSON string output with single \'response\' key with Boolean value representing file existence
+         * Method that checks whether a file exists in the server filestore by using its hash.  Parameters:     file_hash (str): the SHA256 hash of the file\'s name as Hex  Returns:     response (str): JSON string output with single \'response\' key with Boolean value representing file existence
          * @summary Check File Exists
          * @param {string} fileHash 
          * @param {*} [options] Override http request option.
@@ -216,26 +216,26 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Method that takes in a file hash and a job posting URL and returns an enhanced version of the URL tailored for the job posting.  Parameters:     file_hash (str): A hash representation (SHA256) of the desired file\'s name     job_posting_url (str): A url pointing to the desired job posting  Returns:     result (dict): result JSON with MarkDown format of enhanced CV
+         * Method that takes in a file hash (as hex SHA256 output) and a job posting URL and returns an enhanced version of the URL tailored for the job posting.  Parameters:     file_hash (str): A hash representation (SHA256) of the desired file\'s name     job_posting_url (str): A url pointing to the desired job posting  Returns:     result (dict): result JSON with MarkDown format of enhanced CV
          * @summary Enhance Cv
          * @param {string} fileHash 
          * @param {string} jobPostingUrl 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async enhanceCvEnhancePost(fileHash: string, jobPostingUrl: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+        async enhanceCvEnhancePost(fileHash: string, jobPostingUrl: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.enhanceCvEnhancePost(fileHash, jobPostingUrl, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * Method that gets CV file as a pdf/text file and stores it in server\'s memory.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt  Returns:     response (str): JSON string output containing the file hash
-         * @summary Upload Data
+         * @summary Upload File
          * @param {File} cvFile 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async uploadDataUploadPost(cvFile: File, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadDataUploadPost(cvFile, options);
+        async uploadFileUploadPost(cvFile: File, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadFileUploadPost(cvFile, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -249,7 +249,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     const localVarFp = DefaultApiFp(configuration)
     return {
         /**
-         * Method that checks whether a file exists in the server filestore by using its hash.  Parameters:     file_hash (str): the SHA256 hash of the file\'s name  Returns:     response (str): JSON string output with single \'response\' key with Boolean value representing file existence
+         * Method that checks whether a file exists in the server filestore by using its hash.  Parameters:     file_hash (str): the SHA256 hash of the file\'s name as Hex  Returns:     response (str): JSON string output with single \'response\' key with Boolean value representing file existence
          * @summary Check File Exists
          * @param {string} fileHash 
          * @param {*} [options] Override http request option.
@@ -259,25 +259,25 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.checkFileExistsFileFileHashGet(fileHash, options).then((request) => request(axios, basePath));
         },
         /**
-         * Method that takes in a file hash and a job posting URL and returns an enhanced version of the URL tailored for the job posting.  Parameters:     file_hash (str): A hash representation (SHA256) of the desired file\'s name     job_posting_url (str): A url pointing to the desired job posting  Returns:     result (dict): result JSON with MarkDown format of enhanced CV
+         * Method that takes in a file hash (as hex SHA256 output) and a job posting URL and returns an enhanced version of the URL tailored for the job posting.  Parameters:     file_hash (str): A hash representation (SHA256) of the desired file\'s name     job_posting_url (str): A url pointing to the desired job posting  Returns:     result (dict): result JSON with MarkDown format of enhanced CV
          * @summary Enhance Cv
          * @param {string} fileHash 
          * @param {string} jobPostingUrl 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        enhanceCvEnhancePost(fileHash: string, jobPostingUrl: string, options?: any): AxiosPromise<object> {
+        enhanceCvEnhancePost(fileHash: string, jobPostingUrl: string, options?: any): AxiosPromise<string> {
             return localVarFp.enhanceCvEnhancePost(fileHash, jobPostingUrl, options).then((request) => request(axios, basePath));
         },
         /**
          * Method that gets CV file as a pdf/text file and stores it in server\'s memory.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt  Returns:     response (str): JSON string output containing the file hash
-         * @summary Upload Data
+         * @summary Upload File
          * @param {File} cvFile 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        uploadDataUploadPost(cvFile: File, options?: any): AxiosPromise<string> {
-            return localVarFp.uploadDataUploadPost(cvFile, options).then((request) => request(axios, basePath));
+        uploadFileUploadPost(cvFile: File, options?: any): AxiosPromise<string> {
+            return localVarFp.uploadFileUploadPost(cvFile, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -290,7 +290,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  */
 export class DefaultApi extends BaseAPI {
     /**
-     * Method that checks whether a file exists in the server filestore by using its hash.  Parameters:     file_hash (str): the SHA256 hash of the file\'s name  Returns:     response (str): JSON string output with single \'response\' key with Boolean value representing file existence
+     * Method that checks whether a file exists in the server filestore by using its hash.  Parameters:     file_hash (str): the SHA256 hash of the file\'s name as Hex  Returns:     response (str): JSON string output with single \'response\' key with Boolean value representing file existence
      * @summary Check File Exists
      * @param {string} fileHash 
      * @param {*} [options] Override http request option.
@@ -302,7 +302,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Method that takes in a file hash and a job posting URL and returns an enhanced version of the URL tailored for the job posting.  Parameters:     file_hash (str): A hash representation (SHA256) of the desired file\'s name     job_posting_url (str): A url pointing to the desired job posting  Returns:     result (dict): result JSON with MarkDown format of enhanced CV
+     * Method that takes in a file hash (as hex SHA256 output) and a job posting URL and returns an enhanced version of the URL tailored for the job posting.  Parameters:     file_hash (str): A hash representation (SHA256) of the desired file\'s name     job_posting_url (str): A url pointing to the desired job posting  Returns:     result (dict): result JSON with MarkDown format of enhanced CV
      * @summary Enhance Cv
      * @param {string} fileHash 
      * @param {string} jobPostingUrl 
@@ -316,14 +316,14 @@ export class DefaultApi extends BaseAPI {
 
     /**
      * Method that gets CV file as a pdf/text file and stores it in server\'s memory.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt  Returns:     response (str): JSON string output containing the file hash
-     * @summary Upload Data
+     * @summary Upload File
      * @param {File} cvFile 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public uploadDataUploadPost(cvFile: File, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).uploadDataUploadPost(cvFile, options).then((request) => request(this.axios, this.basePath));
+    public uploadFileUploadPost(cvFile: File, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).uploadFileUploadPost(cvFile, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
