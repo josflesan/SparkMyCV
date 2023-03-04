@@ -9,7 +9,6 @@ origins = [
     "localhost:3000"
 ]
 
-
 app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
@@ -17,7 +16,6 @@ app.add_middleware(
         allow_methods=["*"],
         allow_headers=["*"]
 )
-
 
 @app.post("/upload")
 async def upload_data(cv_file: UploadFile,
@@ -34,4 +32,9 @@ async def upload_data(cv_file: UploadFile,
     Returns:
         result (dict): result JSON with MD format of new CV
     """
+
+    file_type = cv_file.filename.split(".")[1]  # pdf or txt
+
+    response.headers[f"Authorization: Bearer {api_key}"]
+
     pass
