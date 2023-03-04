@@ -10,8 +10,8 @@ This is going to be an amazing project for HTB IX.
 cd backend
 python3 -m venv env
 source env/bin/activate
-pip install -r requirements.txt
-python main.py
+pdm install
+python3 main.py
 ```
 
 2. Run client-side React app in different terminal...
