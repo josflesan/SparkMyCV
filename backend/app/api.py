@@ -25,13 +25,16 @@ app.add_middleware(
 )
 
 @app.post("/upload")
-async def upload_data(cv_file: UploadFile) -> None:
+async def upload_data(cv_file: UploadFile) -> str:
     """
     Method that gets CV file as a pdf/text file and stores it in
     server's memory.
 
     Parameters:
         cv_file (UploadFile): A CV file as a PDF/.txt
+    
+    Returns:
+        response (str): JSON string output containing the file hash
     """
 
     file_type = cv_file.filename.split(".")[1]  # pdf or txt
@@ -58,7 +61,7 @@ async def upload_data(cv_file: UploadFile) -> None:
     return json.dumps({"response": "File uploaded correctly"})
 
 @app.get("/file/{file_hash}")
-async def check_file_exists(file_hash: str) -> dict:
+async def check_file_exists(file_hash: str) -> str:
     """
     Method that checks whether a file exists in the server filestore
     by using its hash.
@@ -67,7 +70,7 @@ async def check_file_exists(file_hash: str) -> dict:
         file_hash (str): the SHA256 hash of the file's name
 
     Returns:
-        response (dict): JSON output with single 'response' key with Boolean value representing file existence
+        response (str): JSON string output with single 'response' key with Boolean value representing file existence
     """
     return json.dumps({"response": file_hash in file_store})
 
@@ -117,6 +120,6 @@ def custom_openapi():
     app.openapi_schema = openapi_schema
     
     with open('schema.json', 'w', encoding='utf-8') as f:
-        json.dumps(app.openapi_schema, f, ensure_ascii=False, indent=4)
+        json.dump(app.openapi_schema, f, ensure_ascii=False, indent=4)
 
 custom_openapi()
