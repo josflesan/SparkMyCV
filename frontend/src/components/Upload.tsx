@@ -3,6 +3,7 @@ import Dropzone from 'react-dropzone';
 import { GrTrash } from "react-icons/gr";
 import { BiErrorAlt } from "react-icons/bi";
 import { GrInProgress } from "react-icons/gr";
+import { AiOutlineCheck } from "react-icons/ai";
 import { useAPI } from "../APIProvider";
 import { AppContext, CVs, ModifiedCVState } from "../App";
 
@@ -93,19 +94,20 @@ function JobURLPrompt() {
 function Job({ cv }: { cv: ModifiedCVState }) {
     if (cv.processedState === "processing") {
         return <div className="px-2">
-                {cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1) + " "}
-                <GrInProgress className="inline"/>
+            <GrInProgress className="inline"/>
+            {" " + cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1)}
         </div>
     }
     else if (cv.processedState === "error") {
         return <div className="px-2 text-red-700">
-                {cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1) + " "}
-                <BiErrorAlt className="inline"/>
+            <BiErrorAlt className="inline"/>
+            {" " + cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1)}
         </div>
     }
     else {
         return <div className="px-2 inline text-green-700">
-            {"Job position: " + cv.results?.company}
+            <AiOutlineCheck className="inline"/>
+            {" Job position: " + cv.results?.company}
         </div>
     }
 }
