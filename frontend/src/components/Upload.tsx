@@ -1,23 +1,24 @@
 import { useCallback, useRef, useState } from "react";
-import { CVResults } from "./Result";
 import Dropzone from 'react-dropzone';
 import { GrTrash } from "react-icons/gr";
+import { useAPI } from "../APIProvider";
+import { CVs, ModifiedCVState } from "../App";
 
-function useURLList() {
-    const [urls, setUrls] = useState<{ [key: string]: string; }>({});
-    const curIDRef = useRef(0);
-    const addUrl = useCallback((url: string) => {
-        setUrls(prev => ({ ...prev, [curIDRef.current++]: url }));
-    }, [setUrls]);
-    const removeUrl = useCallback((id: number) => {
-        setUrls(prev => {
-            const newUrls = { ...prev };
-            delete newUrls[id];
-            return newUrls;
-        });
-    }, [setUrls]);
-    return { urls, addUrl, removeUrl };
-}
+// function useCVList() {
+//     // addRequest - adds a request / pending CV to the list
+//     // removeCV - removes a CV from the list regardless of state
+//     // setProcessedCV - assigns a processed CV to a pending CV
+//     // setErrorCV - assigns an error to a pending CV
+//     const [cvs, setCvs] = useState<{[id: number]: ModifiedCVState}>({});
+//     const nextId = useRef(0);
+//     // addRequest
+//     const addRequest = useCallback((url: string) => {
+//         setCvs((cvs: {[id: number]: ModifiedCVState}) => {
+//             return {}
+//         }
+//     }, [setCvs]);
+//     }
+// }
 
 
 function JobURL({url, id, removeUrl}: {url: string, id: number, removeUrl: (id: number) => void}) {
@@ -50,13 +51,13 @@ function FileUploader() {
     </div>;
 }
 
-function JobURLPrompt({ addUrl }: {addUrl: (url: string) => void}) {
+function JobURLPrompt() {
     const [filled, setFilled] = useState(false);
     const urlInputRef = useRef<HTMLInputElement>(null);
     return <div className="flex flex-col gap-4 w-full" onSubmit={(e) => {
         e.preventDefault()
         if (urlInputRef.current) {
-            addUrl(urlInputRef.current.value);
+            // addUrl(urlInputRef.current.value);
             urlInputRef.current.value = "";
         }
     }}>
@@ -67,8 +68,13 @@ function JobURLPrompt({ addUrl }: {addUrl: (url: string) => void}) {
     </div>;
 }
 
-export default function Upload({ setResults }: { setResults: (results: CVResults) => void }) {
-    const { urls, addUrl, removeUrl } = useURLList();
+function Job({cv}: {cv: ModifiedCVState}) {
+    return <div className="flex flex-col gap-4">
+        {JSON.stringify(cv)}
+    </div>
+}
+
+export default function Upload({cvs}: {cvs: CVs}) {
     return (
         <>
             <h1 className='text-6xl font-serif font-[700] text-bold'>
@@ -79,10 +85,12 @@ export default function Upload({ setResults }: { setResults: (results: CVResults
             </div>
             <div className="flex flex-col gap-4">
                 <FileUploader />
+                <div className="flex flex-col gap-4">
                 {
-                    Object.entries(urls).map(([id, url]) => <JobURL key={id} id={parseInt(id)} url={url} removeUrl={removeUrl}/>)
+                    Object.entries(cvs).map(([id, cv]) => <Job key={id} cv={cv} />)
                 }
-                <JobURLPrompt addUrl={addUrl}/>
+                </div>
+                <JobURLPrompt/>
             </div>
         </>
     )
