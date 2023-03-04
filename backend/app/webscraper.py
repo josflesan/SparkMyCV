@@ -1,5 +1,4 @@
 import bs4
-import httpx
 import cloudscraper
 
 class WebScraper:
