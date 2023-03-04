@@ -1,4 +1,4 @@
-from cvFormatter import CVFormatter
+from .cvFormatter import CVFormatter
 from typing import List
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -45,7 +45,8 @@ async def upload_data(cv_file: UploadFile) -> None:
             pages.append(pdf.pages[page].extract_text())
 
         # Hash filename using SHA256 and store in server memory
-        filename_hash = hashlib.sha256(b"{}".format(cv_file.filename)).hexdigest()
+        filename_hash = hashlib.sha256(bytes(cv_file.filename, encoding="utf-8")).hexdigest()
+        print(filename_hash)
 
         file_store[filename_hash] = pages
 
@@ -54,9 +55,9 @@ async def upload_data(cv_file: UploadFile) -> None:
     finally:
         cv_file.file.close()
 
-    return json.dump({"response": "File uploaded correctly"})
+    return json.dumps({"response": "File uploaded correctly"})
 
-@app.get("/file/{hash}")
+@app.get("/file/{file_hash}")
 async def check_file_exists(file_hash: str) -> dict:
     """
     Method that checks whether a file exists in the server filestore
@@ -68,7 +69,7 @@ async def check_file_exists(file_hash: str) -> dict:
     Returns:
         response (dict): JSON output with single 'response' key with Boolean value representing file existence
     """
-    return json.dump({"response": file_hash in file_store})
+    return json.dumps({"response": file_hash in file_store})
 
 @app.post("/enhance")
 async def enhance_cv(file_hash: str,
@@ -116,4 +117,6 @@ def custom_openapi():
     app.openapi_schema = openapi_schema
     
     with open('schema.json', 'w', encoding='utf-8') as f:
-        json.dump(app.openapi_schema, f, ensure_ascii=False, indent=4)
+        json.dumps(app.openapi_schema, f, ensure_ascii=False, indent=4)
+
+custom_openapi()
