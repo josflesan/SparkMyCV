@@ -9,23 +9,18 @@ import json
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:3000",
-    "localhost:3000"
-]
-
 file_store = {}  # Internal store of hash-value pairs for files uploaded
 
 app.add_middleware(
         CORSMiddleware,
-        allow_origins=origins,
+        allow_origins=['*'],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"]
 )
 
 @app.post("/upload")
-async def upload_data(cv_file: UploadFile) -> str:
+async def upload_file(cv_file: UploadFile):
     """
     Method that gets CV file as a pdf/text file and stores it in
     server's memory.
@@ -48,8 +43,8 @@ async def upload_data(cv_file: UploadFile) -> str:
             pages.append(pdf.pages[page].extract_text())
 
         # Hash filename using SHA256 and store in server memory
+        print(cv_file.filename)
         filename_hash = hashlib.sha256(bytes(cv_file.filename, encoding="utf-8")).hexdigest()
-        print(filename_hash)
 
         file_store[filename_hash] = pages
 
@@ -67,7 +62,7 @@ async def check_file_exists(file_hash: str) -> str:
     by using its hash.
 
     Parameters:
-        file_hash (str): the SHA256 hash of the file's name
+        file_hash (str): the SHA256 hash of the file's name as Hex
 
     Returns:
         response (str): JSON string output with single 'response' key with Boolean value representing file existence
@@ -78,7 +73,7 @@ async def check_file_exists(file_hash: str) -> str:
 async def enhance_cv(file_hash: str,
                      job_posting_url: str) -> dict:
     """
-    Method that takes in a file hash and a job posting URL and returns an enhanced version
+    Method that takes in a file hash (as hex SHA256 output) and a job posting URL and returns an enhanced version
     of the URL tailored for the job posting.
 
     Parameters:
@@ -90,12 +85,17 @@ async def enhance_cv(file_hash: str,
     """
 
     # Get file from internal store
+    print(file_hash)
+    print(job_posting_url)
     pdf_pages = file_store[file_hash]
+    print(pdf_pages)
 
     # Preprocess the CV
-    outputCV = CVFormatter.process_cv(pdf_pages, job_posting_url)
+    # outputCV = CVFormatter.process_cv(pdf_pages, job_posting_url)
 
     print(outputCV)
+
+    return json.dumps({"result": outputCV})
 
     # Format CV into JSON output for rendering
     # formattedCV = CVFormatter.format_cv_file(preprocessedCV)
@@ -122,4 +122,3 @@ def custom_openapi():
     with open('schema.json', 'w', encoding='utf-8') as f:
         json.dump(app.openapi_schema, f, ensure_ascii=False, indent=4)
 
-custom_openapi()

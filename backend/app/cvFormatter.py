@@ -26,6 +26,7 @@ class CVFormatter:
         job_posting_text = webscraper.get_text_from_url(job_posting_url)
 
         cv_body = " ".join(cv_pages)  # Join all pages together naively
+        print(cv_body)
         message = [{"role": "system", 
                     "content": f'''Here is my CV:\n\n
                                    {cv_body}\n\n

@@ -9,7 +9,6 @@ class WebScraper:
             'platform': 'android',
             'desktop': False
         })
-        self._client = httpx.Client(http2=True)
 
     def __get_soup(self, url):
         """Returns a BeautifulSoup object for the given URL"""    
