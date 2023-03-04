@@ -23,48 +23,99 @@ export type CVs = {
 export function useCVs() {
 	// setOriginalCV - set the CV PDF to be processed
 	// addRequest - adds a request / pending CV to the list
-    // removeCV - removes a CV from the list regardless of state
-    // setProcessedCV - assigns a processed CV to a pending CV
-    // setErrorCV - assigns an error to a pending CV
-	const api = useAPI();
-	const [originalCV, _setOriginalCV] = useState<File|null>(null);
-	const currentHashRef = useRef<string|null>(null);
-	const cvHashRef = useRef<string|null>(null);
-	const [cvs, setCvs] = useState<CVs>({});
-	const nextIDRef = useRef(0);
+    // deleteCV - removes a CV from the list regardless of state
+
+	const api = useAPI(); // Get API
+	const [originalCV, _setOriginalCV] = useState<File|null>(null); // Store original CV File
+	const [originalCVHash, setOriginalCVHash] = useState<string|null>(null); // Store original CV hash (from server)
+	const [cvs, setCvs] = useState<CVs>({}); // cvs state for rendering
+	const idRef = useRef(0);
 
 	const setOriginalCV = useCallback(async (file: File | null) => {
-		if (api !== null) {
-			if (file) {
-				// Get the SHA256 hash of the file
-				// See if the server has this file already
-				let needsUpload = true;
-				if (currentHashRef.current !== null) {
-					const hasFileResponse = await api.checkFileExistsFileFileHashGet(currentHashRef.current);
-					const response = JSON.parse(hasFileResponse.data);
-					// Throw error if response.response is not a boolean
-					if (typeof response.response !== "boolean") {
-						throw new Error("Invalid response from server");
-					}
-					if (response.response) {
-						needsUpload = false;
-					}
+		if (api !== null) { // Throw error if API is not initialized
+			if (file) { // If file has been set to some file
+				const uploadResponse = await api.uploadFileUploadPost(file); // Upload file
+				console.log(uploadResponse); // This gets the hash of the file
+				if (typeof (uploadResponse.data as any)["file_hash"] !== "string") { // Check file upload response has hash
+					throw new Error("Invalid response from server");
 				}
-				if (needsUpload) {
-					const uploadResponse = await api.uploadFileUploadPost(file);
-					console.log(uploadResponse);
-					_setOriginalCV(file);
-				}
-			} else {
+				_setOriginalCV(file); // Save file object in state
+				setOriginalCVHash((uploadResponse.data as any)["file_hash"]); // Save hash in state
+			} else { // If file has been set to null
 				_setOriginalCV(null);
-				currentHashRef.current = null;
+				setOriginalCVHash(null);
 			}
 		}
 	}, [api, _setOriginalCV]);
+
+	const addRequest = useCallback(async (url: string) => {
+		// Current file hash must not be null
+		if (originalCVHash === null) {
+			throw new Error("No CV uploaded");
+		}
+		if (api !== null) {
+			// Add a request to the list as processing
+			const id = idRef.current++;
+			setCvs((cvs: CVs) => {
+				return {
+					...cvs,
+					[id]: {
+						url,
+						processedState: "processing",
+						results: null,
+						error: null
+					}
+				}
+			});
+			const request = {
+				file_hash: originalCVHash,
+				job_posting_url: url
+			}
+			console.log(request);
+			// Send request to server, and when it comes back, update the state (if it still exists)
+			const response = await api.enhanceCvEnhancePost(request)
+			// Let's assume it always succeeds.. TODO: handle errors
+			// Throw error if response.data.result is not a string
+			if (typeof (response.data as any)["result"] !== "string") {
+				throw new Error("Invalid response from server");
+			}
+			setCvs((cvs: CVs) => {
+				if (cvs[id]) {
+					console.log(response.data)
+					return {
+						...cvs,
+						[id]: {
+							...cvs[id],
+							processedState: "processed",
+							results: {
+								company: "Not implemented",
+								jobTitle: "Not implemented",
+								modifiedCV: (response.data as any)["result"]
+							}
+						}
+					}
+				} else {
+					return cvs;
+				}
+			})
+			console.log(response);
+		}
+	}, [api, originalCVHash]);
+
+	const deleteCV = useCallback((id: number) => {
+		setCvs((cvs: CVs) => {
+			const newCVs = { ...cvs };
+			delete newCVs[id];
+			return newCVs;
+		})
+	}, [setCvs]);
+
 	return {
 		cvs,
 		setOriginalCV,
-		originalCV
+		originalCV,
+		addRequest,
+		deleteCV,
 	}
 }
 
@@ -79,35 +130,35 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
-	const [cvs, setCvs] = useState<CVs>({
-		1: {
-			url: "https://www.linkedin.com/in/alexander-lee-1b1b3b1b3/",
-			processedState: "processing",
-			results: null,
-			error: null
-		},
-		2: {
-			url: "https://www.linkedin.com/in/alexander-lee-1b1b3b1b3/",
-			processedState: "processed",
-			results: {
-				company: "Google",
-				jobTitle: "Software Engineer",
-				modifiedCV: "some cv"
-			},
-			error: null
-		},
-		3: {
-			url: "https://www.linkedin.com/in/alexander-lee-1b1b3b1b3/",
-			processedState: "error",
-			results: null,
-			error: "some error"
-		}
-	});
+	// const [cvs, setCvs] = useState<CVs>({
+	// 	1: {
+	// 		url: "https://www.linkedin.com/in/alexander-lee-1b1b3b1b3/",
+	// 		processedState: "processing",
+	// 		results: null,
+	// 		error: null
+	// 	},
+	// 	2: {
+	// 		url: "https://www.linkedin.com/in/alexander-lee-1b1b3b1b3/",
+	// 		processedState: "processed",
+	// 		results: {
+	// 			company: "Google",
+	// 			jobTitle: "Software Engineer",
+	// 			modifiedCV: "some cv"
+	// 		},
+	// 		error: null
+	// 	},
+	// 	3: {
+	// 		url: "https://www.linkedin.com/in/alexander-lee-1b1b3b1b3/",
+	// 		processedState: "error",
+	// 		results: null,
+	// 		error: "some error"
+	// 	}
+	// });
 	return (
 		<APIProvider url='http://localhost:8020'>
 			<AppContextProvider>
 				<div className='flex flex-col gap-8 w-[800px] m-4'>
-					<Upload cvs={cvs}/>
+					<Upload/>
 				</div>
 			</AppContextProvider>
 		</APIProvider>

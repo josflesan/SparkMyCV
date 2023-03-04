@@ -72,10 +72,12 @@ function FileUploader() {
 function JobURLPrompt() {
     const [filled, setFilled] = useState(false);
     const urlInputRef = useRef<HTMLInputElement>(null);
+    const { addRequest } = useContext(AppContext);
     return <div className="flex flex-col gap-4 w-full" onSubmit={(e) => {
         e.preventDefault()
         if (urlInputRef.current) {
             // addUrl(urlInputRef.current.value);
+            addRequest(urlInputRef.current.value);
             urlInputRef.current.value = "";
         }
     }}>
@@ -92,7 +94,8 @@ function Job({cv}: {cv: ModifiedCVState}) {
     </div>
 }
 
-export default function Upload({cvs}: {cvs: CVs}) {
+export default function Upload() {
+    const {cvs} = useContext(AppContext);
     return (
         <>
             <h1 className='text-6xl font-serif font-[700] text-bold'>
