@@ -23,8 +23,5 @@ export function APIProvider({ url, children }: { url: string, children: React.Re
 
 export function useAPI() {
     const api = useContext(APIContext);
-    if (api === null) {
-        throw new Error("API not initialized");
-    }
     return api;
 }

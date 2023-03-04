@@ -4,7 +4,7 @@ OpenAI interface to make calls to the API with appropriate headers
 
 from typing import List
 from dotenv import load_dotenv
-from webscraper import WebScraper
+from .webscraper import WebScraper
 import os
 import openai
 import json

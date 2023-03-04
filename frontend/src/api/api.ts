@@ -76,18 +76,93 @@ export interface ValidationError {
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Method that gets CV file as a pdf/text file and a list of strings representing desired job postings and returns new CV.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt     urls (List[str]): A list of URL job postings  Returns:     result (dict): result JSON with MD format of new CV
-         * @summary Upload Data
-         * @param {File} cvFile 
-         * @param {Array<string>} urls 
+         * Method that checks whether a file exists in the server filestore by using its hash.  Parameters:     file_hash (str): the SHA256 hash of the file\'s name  Returns:     response (str): JSON string output with single \'response\' key with Boolean value representing file existence
+         * @summary Check File Exists
+         * @param {string} fileHash 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        uploadDataUploadPost: async (cvFile: File, urls: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        checkFileExistsFileFileHashGet: async (fileHash: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'fileHash' is not null or undefined
+            assertParamExists('checkFileExistsFileFileHashGet', 'fileHash', fileHash)
+            const localVarPath = `/file/{file_hash}`
+                .replace(`{${"file_hash"}}`, encodeURIComponent(String(fileHash)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Method that takes in a file hash and a job posting URL and returns an enhanced version of the URL tailored for the job posting.  Parameters:     file_hash (str): A hash representation (SHA256) of the desired file\'s name     job_posting_url (str): A url pointing to the desired job posting  Returns:     result (dict): result JSON with MarkDown format of enhanced CV
+         * @summary Enhance Cv
+         * @param {string} fileHash 
+         * @param {string} jobPostingUrl 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        enhanceCvEnhancePost: async (fileHash: string, jobPostingUrl: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'fileHash' is not null or undefined
+            assertParamExists('enhanceCvEnhancePost', 'fileHash', fileHash)
+            // verify required parameter 'jobPostingUrl' is not null or undefined
+            assertParamExists('enhanceCvEnhancePost', 'jobPostingUrl', jobPostingUrl)
+            const localVarPath = `/enhance`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (fileHash !== undefined) {
+                localVarQueryParameter['file_hash'] = fileHash;
+            }
+
+            if (jobPostingUrl !== undefined) {
+                localVarQueryParameter['job_posting_url'] = jobPostingUrl;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Method that gets CV file as a pdf/text file and stores it in server\'s memory.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt  Returns:     response (str): JSON string output containing the file hash
+         * @summary Upload Data
+         * @param {File} cvFile 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadDataUploadPost: async (cvFile: File, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'cvFile' is not null or undefined
             assertParamExists('uploadDataUploadPost', 'cvFile', cvFile)
-            // verify required parameter 'urls' is not null or undefined
-            assertParamExists('uploadDataUploadPost', 'urls', urls)
             const localVarPath = `/upload`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -105,10 +180,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             if (cvFile !== undefined) { 
                 localVarFormParams.append('cv_file', cvFile as any);
             }
-                if (urls) {
-                localVarFormParams.append('urls', urls.join(COLLECTION_FORMATS.csv));
-            }
-
     
     
             localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
@@ -134,15 +205,37 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
         /**
-         * Method that gets CV file as a pdf/text file and a list of strings representing desired job postings and returns new CV.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt     urls (List[str]): A list of URL job postings  Returns:     result (dict): result JSON with MD format of new CV
-         * @summary Upload Data
-         * @param {File} cvFile 
-         * @param {Array<string>} urls 
+         * Method that checks whether a file exists in the server filestore by using its hash.  Parameters:     file_hash (str): the SHA256 hash of the file\'s name  Returns:     response (str): JSON string output with single \'response\' key with Boolean value representing file existence
+         * @summary Check File Exists
+         * @param {string} fileHash 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async uploadDataUploadPost(cvFile: File, urls: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadDataUploadPost(cvFile, urls, options);
+        async checkFileExistsFileFileHashGet(fileHash: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.checkFileExistsFileFileHashGet(fileHash, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Method that takes in a file hash and a job posting URL and returns an enhanced version of the URL tailored for the job posting.  Parameters:     file_hash (str): A hash representation (SHA256) of the desired file\'s name     job_posting_url (str): A url pointing to the desired job posting  Returns:     result (dict): result JSON with MarkDown format of enhanced CV
+         * @summary Enhance Cv
+         * @param {string} fileHash 
+         * @param {string} jobPostingUrl 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async enhanceCvEnhancePost(fileHash: string, jobPostingUrl: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.enhanceCvEnhancePost(fileHash, jobPostingUrl, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Method that gets CV file as a pdf/text file and stores it in server\'s memory.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt  Returns:     response (str): JSON string output containing the file hash
+         * @summary Upload Data
+         * @param {File} cvFile 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async uploadDataUploadPost(cvFile: File, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadDataUploadPost(cvFile, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -156,15 +249,35 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     const localVarFp = DefaultApiFp(configuration)
     return {
         /**
-         * Method that gets CV file as a pdf/text file and a list of strings representing desired job postings and returns new CV.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt     urls (List[str]): A list of URL job postings  Returns:     result (dict): result JSON with MD format of new CV
-         * @summary Upload Data
-         * @param {File} cvFile 
-         * @param {Array<string>} urls 
+         * Method that checks whether a file exists in the server filestore by using its hash.  Parameters:     file_hash (str): the SHA256 hash of the file\'s name  Returns:     response (str): JSON string output with single \'response\' key with Boolean value representing file existence
+         * @summary Check File Exists
+         * @param {string} fileHash 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        uploadDataUploadPost(cvFile: File, urls: Array<string>, options?: any): AxiosPromise<object> {
-            return localVarFp.uploadDataUploadPost(cvFile, urls, options).then((request) => request(axios, basePath));
+        checkFileExistsFileFileHashGet(fileHash: string, options?: any): AxiosPromise<string> {
+            return localVarFp.checkFileExistsFileFileHashGet(fileHash, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Method that takes in a file hash and a job posting URL and returns an enhanced version of the URL tailored for the job posting.  Parameters:     file_hash (str): A hash representation (SHA256) of the desired file\'s name     job_posting_url (str): A url pointing to the desired job posting  Returns:     result (dict): result JSON with MarkDown format of enhanced CV
+         * @summary Enhance Cv
+         * @param {string} fileHash 
+         * @param {string} jobPostingUrl 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        enhanceCvEnhancePost(fileHash: string, jobPostingUrl: string, options?: any): AxiosPromise<object> {
+            return localVarFp.enhanceCvEnhancePost(fileHash, jobPostingUrl, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Method that gets CV file as a pdf/text file and stores it in server\'s memory.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt  Returns:     response (str): JSON string output containing the file hash
+         * @summary Upload Data
+         * @param {File} cvFile 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadDataUploadPost(cvFile: File, options?: any): AxiosPromise<string> {
+            return localVarFp.uploadDataUploadPost(cvFile, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -177,16 +290,40 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  */
 export class DefaultApi extends BaseAPI {
     /**
-     * Method that gets CV file as a pdf/text file and a list of strings representing desired job postings and returns new CV.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt     urls (List[str]): A list of URL job postings  Returns:     result (dict): result JSON with MD format of new CV
-     * @summary Upload Data
-     * @param {File} cvFile 
-     * @param {Array<string>} urls 
+     * Method that checks whether a file exists in the server filestore by using its hash.  Parameters:     file_hash (str): the SHA256 hash of the file\'s name  Returns:     response (str): JSON string output with single \'response\' key with Boolean value representing file existence
+     * @summary Check File Exists
+     * @param {string} fileHash 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public uploadDataUploadPost(cvFile: File, urls: Array<string>, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).uploadDataUploadPost(cvFile, urls, options).then((request) => request(this.axios, this.basePath));
+    public checkFileExistsFileFileHashGet(fileHash: string, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).checkFileExistsFileFileHashGet(fileHash, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Method that takes in a file hash and a job posting URL and returns an enhanced version of the URL tailored for the job posting.  Parameters:     file_hash (str): A hash representation (SHA256) of the desired file\'s name     job_posting_url (str): A url pointing to the desired job posting  Returns:     result (dict): result JSON with MarkDown format of enhanced CV
+     * @summary Enhance Cv
+     * @param {string} fileHash 
+     * @param {string} jobPostingUrl 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public enhanceCvEnhancePost(fileHash: string, jobPostingUrl: string, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).enhanceCvEnhancePost(fileHash, jobPostingUrl, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Method that gets CV file as a pdf/text file and stores it in server\'s memory.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt  Returns:     response (str): JSON string output containing the file hash
+     * @summary Upload Data
+     * @param {File} cvFile 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public uploadDataUploadPost(cvFile: File, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).uploadDataUploadPost(cvFile, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

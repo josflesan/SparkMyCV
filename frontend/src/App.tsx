@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { createContext, useCallback, useRef, useState } from 'react'
 import Upload from './components/Upload';
 import { Configuration, DefaultApi } from './api';
 import { APIProvider, useAPI } from './APIProvider';
@@ -20,6 +20,14 @@ export type CVs = {
 	[id: number]: ModifiedCVState
 }
 
+async function calculateSHA256(file: File): Promise<string> {
+	const buffer = await file.arrayBuffer();
+	const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+	const hashArray = Array.from(new Uint8Array(hashBuffer));
+	const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+	return hashHex;
+}
+
 export function useCVs() {
 	// setOriginalCV - set the CV PDF to be processed
 	// addRequest - adds a request / pending CV to the list
@@ -28,26 +36,33 @@ export function useCVs() {
     // setErrorCV - assigns an error to a pending CV
 	const api = useAPI();
 	const cvRef = useRef<CVs>({});
+	const cvHashRef = useRef<string|null>(null);
 	const [cvs, setCvs] = useState<CVs>({});
 	const nextIDRef = useRef(0);
 
-	const setOriginalCV = useCallback((file: File | null) => {
+	const setOriginalCV = useCallback(async (file: File | null) => {
 		if (file) {
-			const reader = new FileReader();
-			reader.onload = (e) => {
-				if (e.target) {
-					const data = e.target.result;
-					if (data) {
-						// api.uploadCV(data as string).then((response) => {
-						// 	console.log(response);
-						// });
-					}
-				}
-			}
-			reader.readAsDataURL(file);
+			// Get the SHA256 hash of the file
+			const hash = await calculateSHA256(file);
+			// See if the server has this file already
+			const hasFileResponse = await api.checkFileExistsFileFileHashGet(hash);
+			console.log(hasFileResponse);
 		}
 	}, [api]);
+	return {
+		cvs,
+		setOriginalCV
+	}
+}
 
+export const AppContext = createContext<ReturnType<typeof useCVs>>({} as any);
+function AppContextProvider({ children }: { children: React.ReactNode }) {
+	const context = useCVs();
+	return (
+		<AppContext.Provider value={context}>
+			{children}
+		</AppContext.Provider>
+	)
 }
 
 function App() {
@@ -75,11 +90,14 @@ function App() {
 			error: "some error"
 		}
 	});
+	const {setOriginalCV} = useCVs();
 	return (
-		<APIProvider url='http://localhost:8080'>
-			<div className='flex flex-col gap-8 w-[800px] m-4'>
-				<Upload cvs={cvs}/>
-			</div>
+		<APIProvider url='http://localhost:8020'>
+			<AppContextProvider>
+				<div className='flex flex-col gap-8 w-[800px] m-4'>
+					<Upload cvs={cvs}/>
+				</div>
+			</AppContextProvider>
 		</APIProvider>
 	)
 }

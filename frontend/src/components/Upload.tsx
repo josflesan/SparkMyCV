@@ -1,8 +1,8 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useContext, useRef, useState } from "react";
 import Dropzone from 'react-dropzone';
 import { GrTrash } from "react-icons/gr";
 import { useAPI } from "../APIProvider";
-import { CVs, ModifiedCVState } from "../App";
+import { AppContext, CVs, ModifiedCVState } from "../App";
 
 // function useCVList() {
 //     // addRequest - adds a request / pending CV to the list
@@ -31,8 +31,14 @@ function JobURL({url, id, removeUrl}: {url: string, id: number, removeUrl: (id: 
 }
 
 function FileUploader() {
+    const {setOriginalCV} = useContext(AppContext);
     return <div className="">
-        <Dropzone onDrop={(files: File[]) => console.log(files)}>
+        <Dropzone onDrop={(files: File[]) => {
+            if (files.length > 0) {
+                setOriginalCV(files[0]);
+            }
+            console.log(files);
+        }}>
             {({ getRootProps, getInputProps }) => (
                 // Center all content
                 <div className="container p-8 cursor-pointer hover-border">

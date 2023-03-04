@@ -9,7 +9,7 @@
         "/upload": {
             "post": {
                 "summary": "Upload Data",
-                "description": "Method that gets CV file as a pdf/text file and a list\nof strings representing desired job postings and returns\nnew CV.\n\nParameters:\n    cv_file (UploadFile): A CV file as a PDF/.txt\n    urls (List[str]): A list of URL job postings\n\nReturns:\n    result (dict): result JSON with MD format of new CV",
+                "description": "Method that gets CV file as a pdf/text file and stores it in\nserver's memory.\n\nParameters:\n    cv_file (UploadFile): A CV file as a PDF/.txt\n\nReturns:\n    response (str): JSON string output containing the file hash",
                 "operationId": "upload_data_upload_post",
                 "requestBody": {
                     "content": {
@@ -28,6 +28,97 @@
                             "application/json": {
                                 "schema": {
                                     "title": "Response Upload Data Upload Post",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/file/{file_hash}": {
+            "get": {
+                "summary": "Check File Exists",
+                "description": "Method that checks whether a file exists in the server filestore\nby using its hash.\n\nParameters:\n    file_hash (str): the SHA256 hash of the file's name\n\nReturns:\n    response (str): JSON string output with single 'response' key with Boolean value representing file existence",
+                "operationId": "check_file_exists_file__file_hash__get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "File Hash",
+                            "type": "string"
+                        },
+                        "name": "file_hash",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Response Check File Exists File  File Hash  Get",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/enhance": {
+            "post": {
+                "summary": "Enhance Cv",
+                "description": "Method that takes in a file hash and a job posting URL and returns an enhanced version\nof the URL tailored for the job posting.\n\nParameters:\n    file_hash (str): A hash representation (SHA256) of the desired file's name\n    job_posting_url (str): A url pointing to the desired job posting\n\nReturns:\n    result (dict): result JSON with MarkDown format of enhanced CV",
+                "operationId": "enhance_cv_enhance_post",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "File Hash",
+                            "type": "string"
+                        },
+                        "name": "file_hash",
+                        "in": "query"
+                    },
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Job Posting Url",
+                            "type": "string"
+                        },
+                        "name": "job_posting_url",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Response Enhance Cv Enhance Post",
                                     "type": "object"
                                 }
                             }
@@ -52,8 +143,7 @@
             "Body_upload_data_upload_post": {
                 "title": "Body_upload_data_upload_post",
                 "required": [
-                    "cv_file",
-                    "urls"
+                    "cv_file"
                 ],
                 "type": "object",
                 "properties": {
@@ -61,13 +151,6 @@
                         "title": "Cv File",
                         "type": "string",
                         "format": "binary"
-                    },
-                    "urls": {
-                        "title": "Urls",
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
                     }
                 }
             },

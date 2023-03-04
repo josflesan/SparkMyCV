@@ -27,4 +27,5 @@ requires = ["pdm-pep517>=1.0"]
 build-backend = "pdm.pep517.api"
 
 [tool.pdm.scripts]
-build_schema = "python ./app/build_schema.py"
+build_schema = "pdm run python ./app/build_schema.py"
+dev = "pdm run python ./main.py"
