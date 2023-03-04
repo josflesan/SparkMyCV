@@ -2,7 +2,9 @@ from .cvFormatter import CVFormatter
 from typing import List
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.utils import get_openapi
 from PyPDF2 import PdfFileReader
+import json
 
 app = FastAPI()
 
@@ -54,9 +56,33 @@ async def upload_data(cv_file: UploadFile,
         cv_file.file.close()
 
     # Preprocess the CV
-    # preprocessedCV = CVFormatter.preprocess_cv(pages, urls)
+    outputCVs = []
+    for url in urls:
+        outputCVs.append(CVFormatter.process_cv(pages, url))
+    
+    print(outputCVs[0])
 
     # Format CV into JSON output for rendering
     # formattedCV = CVFormatter.format_cv_file(preprocessedCV)
 
     # return formattedCV
+
+def custom_openapi():
+    """
+    Method to generate API schema for TS client
+    """
+    
+    if app.openapi_schema:
+        return app.openapi_schema
+    
+    openapi_schema = get_openapi(
+        title="Pimp My CV API",
+        version="0.1.0",
+        description="CV Enhancer RESTful API",
+        routes=app.routes,
+    )
+
+    app.openapi_schema = openapi_schema
+    
+    with open('schema.json', 'w', encoding='utf-8') as f:
+        json.dump(app.openapi_schema, f, ensure_ascii=False, indent=4)
