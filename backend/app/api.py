@@ -3,7 +3,7 @@ from typing import List
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from PyPDF2 import PdfFileReader
+from PyPDF2 import PdfReader
 import hashlib
 import json
 
@@ -20,7 +20,7 @@ app.add_middleware(
 )
 
 @app.post("/upload")
-async def upload_file(cv_file: UploadFile):
+async def upload_file(cv_file: UploadFile) -> str:
     """
     Method that gets CV file as a pdf/text file and stores it in
     server's memory.
@@ -38,12 +38,11 @@ async def upload_file(cv_file: UploadFile):
     pages = []  # Textual representation of each page of a CV
     try:
         # Convert file to string
-        pdf = PdfFileReader(cv_file.file)
+        pdf = PdfReader(cv_file.file)
         for page in range(len(pdf.pages)):
             pages.append(pdf.pages[page].extract_text())
 
         # Hash filename using SHA256 and store in server memory
-        print(cv_file.filename)
         filename_hash = hashlib.sha256(bytes(cv_file.filename, encoding="utf-8")).hexdigest()
 
         file_store[filename_hash] = pages
@@ -71,7 +70,7 @@ async def check_file_exists(file_hash: str) -> str:
 
 @app.post("/enhance")
 async def enhance_cv(file_hash: str,
-                     job_posting_url: str) -> dict:
+                     job_posting_url: str) -> str:
     """
     Method that takes in a file hash (as hex SHA256 output) and a job posting URL and returns an enhanced version
     of the URL tailored for the job posting.
