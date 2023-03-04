@@ -4,12 +4,18 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from PyPDF2 import PdfReader
+from pydantic import BaseModel
 import hashlib
 import json
 
 app = FastAPI()
 
 file_store = {}  # Internal store of hash-value pairs for files uploaded
+
+# Schema for /enhance request body
+class EnhanceBody(BaseModel):
+    file_hash: str
+    job_posting_url: str
 
 app.add_middleware(
         CORSMiddleware,
@@ -20,7 +26,7 @@ app.add_middleware(
 )
 
 @app.post("/upload")
-async def upload_file(cv_file: UploadFile) -> str:
+async def upload_file(cv_file: UploadFile) -> dict:
     """
     Method that gets CV file as a pdf/text file and stores it in
     server's memory.
@@ -52,10 +58,10 @@ async def upload_file(cv_file: UploadFile) -> str:
     finally:
         cv_file.file.close()
 
-    return json.dumps({"response": "File uploaded correctly"})
+    return {"response": "File uploaded correctly"}
 
 @app.get("/file/{file_hash}")
-async def check_file_exists(file_hash: str) -> str:
+async def check_file_exists(file_hash: str) -> dict:
     """
     Method that checks whether a file exists in the server filestore
     by using its hash.
@@ -64,13 +70,12 @@ async def check_file_exists(file_hash: str) -> str:
         file_hash (str): the SHA256 hash of the file's name as Hex
 
     Returns:
-        response (str): JSON string output with single 'response' key with Boolean value representing file existence
+        response (dict): JSON output with single 'response' key with Boolean value representing file existence
     """
-    return json.dumps({"response": file_hash in file_store})
+    return {"response": file_hash in file_store}
 
 @app.post("/enhance")
-async def enhance_cv(file_hash: str,
-                     job_posting_url: str) -> str:
+async def enhance_cv(data: EnhanceBody) -> dict:
     """
     Method that takes in a file hash (as hex SHA256 output) and a job posting URL and returns an enhanced version
     of the URL tailored for the job posting.
@@ -84,17 +89,13 @@ async def enhance_cv(file_hash: str,
     """
 
     # Get file from internal store
-    print(file_hash)
-    print(job_posting_url)
-    pdf_pages = file_store[file_hash]
-    print(pdf_pages)
+    pdf_pages = file_store[data.file_hash]
 
     # Preprocess the CV
-    # outputCV = CVFormatter.process_cv(pdf_pages, job_posting_url)
+    openAIOut = CVFormatter.process_cv(pdf_pages, data.job_posting_url)
+    outputCV = openAIOut['choices'][0]['message']["content"]
 
-    print(outputCV)
-
-    return json.dumps({"result": outputCV})
+    return {"result": outputCV}
 
     # Format CV into JSON output for rendering
     # formattedCV = CVFormatter.format_cv_file(preprocessedCV)
