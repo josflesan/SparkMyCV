@@ -1,6 +1,8 @@
+from .cvFormatter import CVFormatter
 from typing import List
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from PyPDF2 import PdfFileReader
 
 app = FastAPI()
 
@@ -34,7 +36,27 @@ async def upload_data(cv_file: UploadFile,
     """
 
     file_type = cv_file.filename.split(".")[1]  # pdf or txt
+    
+    print(f"Filename: {cv_file.filename}")
+    print(f"File of type {file_type}")
 
-    response.headers[f"Authorization: Bearer {api_key}"]
+    assert file_type == "pdf"
 
-    pass
+    pages = []  # Textual representation of each page of a CV
+    try:
+        # Convert file to string
+        pdf = PdfFileReader(cv_file.file)
+        for page in range(len(pdf.pages)):
+            pages.append(pdf.pages[page].extract_text())
+    except Exception:
+        return {"message": "There was an error uploading the file"}
+    finally:
+        cv_file.file.close()
+
+    # Preprocess the CV
+    # preprocessedCV = CVFormatter.preprocess_cv(pages, urls)
+
+    # Format CV into JSON output for rendering
+    # formattedCV = CVFormatter.format_cv_file(preprocessedCV)
+
+    # return formattedCV
