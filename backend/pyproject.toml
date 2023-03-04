@@ -15,7 +15,8 @@ dependencies = [
     "pypdf2>=3.0.1",
     "python-dotenv>=1.0.0",
     "cloudscraper>=1.2.69",
-    "beautifulsoup4>=4.11.2"
+    "beautifulsoup4>=4.11.2",
+    "python-multipart>=0.0.6",
 ]
 requires-python = ">=3.10"
 readme = "README.md"
@@ -24,3 +25,6 @@ license = {text = "MIT"}
 [build-system]
 requires = ["pdm-pep517>=1.0"]
 build-backend = "pdm.pep517.api"
+
+[tool.pdm.scripts]
+build_schema = "python ./app/build_schema.py"

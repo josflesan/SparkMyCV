@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build_schema": "cd ../backend && pdm run build_schema && cp -r ../backend/schema.json ../frontend/src/schema.json && cd ../frontend && npx openapi-generator-cli generate -i src/schema.json -g typescript-axios -o src/api",
+    "dev": "npm run build_schema && vite dev"
   },
   "dependencies": {
     "react": "^18.2.0",
