@@ -1,6 +1,8 @@
 import { useCallback, useContext, useRef, useState } from "react";
 import Dropzone from 'react-dropzone';
 import { GrTrash } from "react-icons/gr";
+import { BiErrorAlt } from "react-icons/bi";
+import { GrInProgress } from "react-icons/gr";
 import { useAPI } from "../APIProvider";
 import { AppContext, CVs, ModifiedCVState } from "../App";
 
@@ -21,7 +23,7 @@ import { AppContext, CVs, ModifiedCVState } from "../App";
 // }
 
 
-function JobURL({url, id, removeUrl}: {url: string, id: number, removeUrl: (id: number) => void}) {
+function JobURL({ url, id, removeUrl }: { url: string, id: number, removeUrl: (id: number) => void }) {
     return <div className="flex flex-row gap-4">
         <div className="flex-grow">{url}</div>
         <button onClick={() => removeUrl(id)}>
@@ -80,19 +82,33 @@ function JobURLPrompt() {
         }
     }}>
         <form className="w-full overflow-clip flex flex-row hover-border">
-            <input ref={urlInputRef} type="text" name="jobURL" className="grow px-2" onChange={(e) => setFilled(e.target.value.length > 0)} placeholder="Paste a URL for a job posting..."/>
+            <input ref={urlInputRef} type="text" name="jobURL" className="grow px-2" onChange={(e) => setFilled(e.target.value.length > 0)} placeholder="Paste a URL for a job posting..." />
             <button className="px-4" disabled={!filled}>+</button>
         </form>
     </div>;
 }
 
-function Job({cv}: {cv: ModifiedCVState}) {
-    return <div className="flex flex-col gap-4">
-        {JSON.stringify(cv)}
-    </div>
+function Job({ cv }: { cv: ModifiedCVState }) {
+    if (cv.processedState === "processing") {
+        return <div className="px-2">
+                {cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1) + " "}
+                <GrInProgress className="inline"/>
+        </div>
+    }
+    else if (cv.processedState === "error") {
+        return <div className="px-2 text-red-700">
+                {cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1) + " "}
+                <BiErrorAlt className="inline"/>
+        </div>
+    }
+    else {
+        return <div className="px-2 inline text-green-700">
+            {"Job position: " + cv.results?.company}
+        </div>
+    }
 }
 
-export default function Upload({cvs}: {cvs: CVs}) {
+export default function Upload({ cvs }: { cvs: CVs }) {
     return (
         <>
             <h1 className='text-6xl font-serif font-[700] text-bold'>
@@ -104,11 +120,11 @@ export default function Upload({cvs}: {cvs: CVs}) {
             <div className="flex flex-col gap-4">
                 <FileUploader />
                 <div className="flex flex-col gap-4">
-                {
-                    Object.entries(cvs).map(([id, cv]) => <Job key={id} cv={cv} />)
-                }
+                    {
+                        Object.entries(cvs).map(([id, cv]) => <Job key={id} cv={cv} />)
+                    }
                 </div>
-                <JobURLPrompt/>
+                <JobURLPrompt />
             </div>
         </>
     )
