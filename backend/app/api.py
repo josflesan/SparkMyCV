@@ -1,4 +1,4 @@
-from .cvFormatter import CVFormatter
+from cvFormatter import CVFormatter
 from typing import List
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
