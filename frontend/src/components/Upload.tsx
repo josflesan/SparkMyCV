@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { CVResults } from "./Result";
 import Dropzone from 'react-dropzone';
-
+import { GrTrash } from "react-icons/gr";
 
 function useURLList() {
     const [urls, setUrls] = useState<{ [key: string]: string; }>({});
@@ -23,7 +23,9 @@ function useURLList() {
 function JobURL({url, id, removeUrl}: {url: string, id: number, removeUrl: (id: number) => void}) {
     return <div className="flex flex-row gap-4">
         <div className="flex-grow">{url}</div>
-        <button onClick={() => removeUrl(id)}></button>
+        <button onClick={() => removeUrl(id)}>
+            <GrTrash />
+        </button>
     </div>
 }
 
