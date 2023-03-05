@@ -43,7 +43,31 @@ export function useCVs() {
 	const api = useAPI(); // Get API
 	const [originalCV, _setOriginalCV] = useState<File|null>(null); // Store original CV File
 	const [originalCVHash, setOriginalCVHash] = useState<string|null>(null); // Store original CV hash (from server)
-	const [cvs, setCvs] = useState<CVs>({}); // cvs state for rendering
+	const [cvs, setCvs] = useState<CVs>({})
+	// const [cvs, setCvs] = useState<CVs>({
+	// 	1: {
+	// 		url: "https://www.linkedin.com/in/alexander-lee-1b1b3b1b3/",
+	// 		processedState: "processing",
+	// 		results: null,
+	// 		error: null
+	// 	},
+	// 	2: {
+	// 		url: "https://www.linkedin.com/in/alexander-lee-1b1b3b1b3/",
+	// 		processedState: "processed",
+	// 		results: {
+	// 			company: "Google",
+	// 			jobTitle: "Software Engineer",
+	// 			modifiedCV: []
+	// 		},
+	// 		error: null
+	// 	},
+	// 	3: {
+	// 		url: "https://www.linkedin.com/in/alexander-lee-1b1b3b1b3/",
+	// 		processedState: "error",
+	// 		results: null,
+	// 		error: "some error"
+	// 	}
+	// }); // cvs state for rendering
 	const idRef = useRef(0);
 
 	const setOriginalCV = useCallback(async (file: File | null) => {
@@ -162,30 +186,6 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
-	// const [cvs, setCvs] = useState<CVs>({
-	// 	1: {
-	// 		url: "https://www.linkedin.com/in/alexander-lee-1b1b3b1b3/",
-	// 		processedState: "processing",
-	// 		results: null,
-	// 		error: null
-	// 	},
-	// 	2: {
-	// 		url: "https://www.linkedin.com/in/alexander-lee-1b1b3b1b3/",
-	// 		processedState: "processed",
-	// 		results: {
-	// 			company: "Google",
-	// 			jobTitle: "Software Engineer",
-	// 			modifiedCV: "some cv"
-	// 		},
-	// 		error: null
-	// 	},
-	// 	3: {
-	// 		url: "https://www.linkedin.com/in/alexander-lee-1b1b3b1b3/",
-	// 		processedState: "error",
-	// 		results: null,
-	// 		error: "some error"
-	// 	}
-	// });
 	return (
 		<APIProvider url='http://localhost:8020'>
 			<AppContextProvider>

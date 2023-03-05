@@ -93,14 +93,15 @@ function Job({ cv, id }: { cv: ModifiedCVState, id: string }) {
                     {
                         cv.processedState === "processing" ? (
                             <div className="px-2">
-                                <GrInProgress className="inline" />
-                                <AnimatedEllipsis/>
+                                <ProcessingText url={cv.url}/>
                             </div>
                         ) : (
                             cv.processedState === "error" ? (
                                 <div className="px-2 text-red-700">
-                                    <BiErrorAlt className="inline" />
-                                    {" " + cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1)}
+                                    <BiErrorAlt className="inline translate-y-[-1.5px]" />
+                                    <div className="inline ml-2">
+                                        {`Error: ${cv.error}`}
+                                    </div>
                                 </div>
                             ) : (
                                 <>
@@ -122,7 +123,7 @@ function Job({ cv, id }: { cv: ModifiedCVState, id: string }) {
                 {
                     cv.results === null ? null : <DownloadIcon content={cv.results}/>
                 }
-                <GrTrash className="cursor-pointer" onClick={() => {
+                <GrTrash className="cursor-pointer translate-y-[-1.5px]" onClick={() => {
                     deleteCV(id)
                 }}/>
             </div>
@@ -152,7 +153,6 @@ const processingText = [
     "Assembling a CV like a puzzle",
     "Shuffling through job history",
     "Crafting a work of art on paper",
-    "Putting your best foot forward (on paper)",
     "Turning work experience into gold",
     "Mixing and matching accomplishments",
     "Brainstorming the perfect CV headline",
@@ -175,7 +175,6 @@ const processingText = [
     "Reinventing the way you sell yourself",
     "Building a CV that tells your story",
     "Making your CV a page-turner",
-    "Unleashing your potential (on paper)",
     "Turning your CV into a masterpiece of persuasion",
     "Transforming your career history into a work of genius",
     "Creating a CV that screams 'Hire Me!'",
@@ -185,14 +184,12 @@ const processingText = [
     "Making your CV sparkle and shine",
     "Building a bridge between you and your dream job",
     "Creating a CV that'll knock their socks off",
-    "Taking your job search to the next level (on paper)",
     "Transforming your work experience into a work of art",
     "Polishing up your professional story",
     "Making your CV a true reflection of your awesomeness",
     "Revving up your CV engine",
-    "Putting the 'pro' in 'productivity' (on paper)",
+    "Putting the 'pro' in 'productivity'",
     "Creating a CV that'll make recruiters drool",
-    "Unleashing your creativity (on paper)",
     "Building a CV that's impossible to ignore",
     "Turning your job search into a work of passion",
     "Crafting a CV that's worth its weight in gold",
@@ -205,7 +202,6 @@ const processingText = [
     "Polishing up your career highlights",
     "Creating a CV that's simply irresistible",
     "Making your CV a force to be reckoned with",
-    "Unleashing your potential (on paper)",
     "Crafting a CV that's sure to impress",
     "Putting the 'pro' in 'professionalism'",
     "Building a CV that's bulletproof",
@@ -236,23 +232,28 @@ function ProcessingText({url}: {url: string}) {
     const [loadingIndex, setLoadingIndex] = useState<number>(0);
     useEffect(()=>{
         const interval = setInterval(()=>{
-            setLoadingIndex((last)=>{
-                return last+1 % processingText.length
-            })
+            setLoadingIndex(()=>Math.floor(Math.random() * processingText.length))
         }, 5000)
     },[])
     return (
-        <div>
-            <div className="inline w-64 overflow-ellipsis">
-                {url}
-            </div>
+        <div className="inline">
+            <div className="flex flex-row flex-nowrap">
             <div className="inline">
-                {
-                    loadingIndex
-                }
+                <div className="overflow-hidden whitespace-nowrap text-ellipsis w-64">
+                <GrInProgress className="inline mr-2"/>
+                    {`${url}`}
+                </div>
+            </div>
+            
+            <div className="inline">
+                <span>
+                    {processingText[loadingIndex]}
+                </span>
                 <AnimatedEllipsis/>
             </div>
         </div>
+        </div>
+        
     )
 }
 
