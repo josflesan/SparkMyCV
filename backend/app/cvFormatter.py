@@ -127,7 +127,7 @@ class CVFormatter:
             },
             {
                 "type": "bullet",
-                "content": ["Skill 1", "Skill 2"]
+                "content": "String representing list of skills separated by newline characters"
             }
         ]       
         '''
