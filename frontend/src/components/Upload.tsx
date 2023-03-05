@@ -6,6 +6,8 @@ import { GrInProgress } from "react-icons/gr";
 import { AiOutlineCheck } from "react-icons/ai";
 import { useAPI } from "../APIProvider";
 import { AppContext, CVs, ModifiedCVState } from "../App";
+import { PDFViewer } from "@react-pdf/renderer";
+import { CVDocument } from "./renderer/CVRenderer";
 
 // function useCVList() {
 //     // addRequest - adds a request / pending CV to the list
@@ -92,24 +94,67 @@ function JobURLPrompt() {
 }
 
 function Job({ cv }: { cv: ModifiedCVState }) {
-    if (cv.processedState === "processing") {
-        return <div className="px-2">
-            <GrInProgress className="inline"/>
-            {" " + cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1)}
+    // if (cv.processedState === "processing") {
+    //     return <div className="px-2">
+    //         <GrInProgress className="inline"/>
+    //         {" " + cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1)}
+    //     </div>
+    // }
+    // else if (cv.processedState === "error") {
+    //     return <div className="px-2 text-red-700">
+    //         <BiErrorAlt className="inline"/>
+    //         {" " + cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1)}
+    //     </div>
+    // }
+    // else {
+    //     return 
+    //     <>
+    //         <div className="px-2 inline text-green-700">
+    //             <AiOutlineCheck className="inline"/>
+    //             {" Job position: " + cv.results?.company}
+    //         </div>
+    //         <PDFViewer>
+    //             <CVDocument content={cv.results?.modifiedCV}/>
+    //         </PDFViewer>
+    //     </>
+    // }
+    // Rewrite with one render with ? : syntax
+    return (
+        <div className="flex flex-row gap-4">
+            <div className="flex-grow">
+                {
+                    cv.processedState === "processing" ? (
+                        <div className="px-2">
+                            <GrInProgress className="inline"/>
+                            {" " + cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1)}
+                        </div>
+                    ) : (
+                        cv.processedState === "error" ? (
+                            <div className="px-2 text-red-700">
+                                <BiErrorAlt className="inline"/>
+                                {" " + cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1)}
+                            </div>
+                        ) : (
+                            <>
+                                <div className="px-2 inline text-green-700">
+                                    <AiOutlineCheck className="inline"/>
+                                    {" Job position: " + cv.results?.company}
+                                </div>
+                                {/* <PDFViewer>
+                                    <CVDocument content={cv.results?.modifiedCV}/>
+                                </PDFViewer> */}
+                            </>
+                        )
+                    )
+                }
+            </div>
+            <button onClick={() => {
+                console.log("Clicked");
+            }}>
+                <GrTrash />
+            </button>
         </div>
-    }
-    else if (cv.processedState === "error") {
-        return <div className="px-2 text-red-700">
-            <BiErrorAlt className="inline"/>
-            {" " + cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1)}
-        </div>
-    }
-    else {
-        return <div className="px-2 inline text-green-700">
-            <AiOutlineCheck className="inline"/>
-            {" Job position: " + cv.results?.company}
-        </div>
-    }
+    )
 }
 
 export default function Upload() {
@@ -130,6 +175,24 @@ export default function Upload() {
                     }
                 </div>
                 <JobURLPrompt />
+                <PDFViewer className="h-[1000px]">
+                    <CVDocument content={
+                        [
+                            {
+                                "type": "h1",
+                                "content": "Hello world"
+                            },
+                            {
+                                "type": "p",
+                                "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                            },
+                            {
+                                "type": "bullet",
+                                "content": "This is a point\nThis is another point"
+                            }
+                        ]
+                    }/>
+                </PDFViewer>
             </div>
         </>
     )
