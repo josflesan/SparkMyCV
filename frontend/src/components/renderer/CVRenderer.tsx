@@ -1,7 +1,7 @@
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 
 export type RawCVComponentObject = {
-    type: "bullet" | "p" | "h1" | "h2" | "h3"
+    type: "bullet" | "p" | "h1" | "h2" | "h3" | "div"
     content: RawCVComponentChildren
 }
 // For bullet points, schema expects string with newline for seperating into bullet points
@@ -52,8 +52,8 @@ export function BulletRenderer({ content }: WithType<RawCVComponentObject, "bull
             {
                 Array.isArray(content) ? content.map((child, index) => <CVRendererAssigner key={index} cv={child} />) : (
                     // Split on newlines
-                    content.split("\n").map((point: string)=>(
-                        <Text>{`• ${point}\n`}</Text>
+                    content.split("\n").map((point: string, index)=>(
+                        <Text key={index}>{`• ${point}\n`}</Text>
                     ))
                 )
             }
@@ -105,6 +105,8 @@ export function CVRendererAssigner({ cv }: { cv: RawCVComponentObject }): JSX.El
             return <H2Renderer {...cv as WithType<RawCVComponentObject, "h2">} />
         case "h3":
             return <H3Renderer {...cv as WithType<RawCVComponentObject, "h3">} />
+        case "div":
+            return <PRenderer {...cv as WithType<RawCVComponentObject, "p">} /> // Hack!
     }
 }
 

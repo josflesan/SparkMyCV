@@ -151,24 +151,13 @@ export default function Upload() {
                     }
                 </div>
                 <JobURLPrompt />
-                {/* <PDFViewer className="h-[1000px]">
+                <PDFViewer className="h-[1000px]">
                     <CVDocument content={
-                        [
-                            {
-                                "type": "h1",
-                                "content": "Hello world"
-                            },
-                            {
-                                "type": "p",
-                                "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                            },
-                            {
-                                "type": "bullet",
-                                "content": "This is a point\nThis is another point"
-                            }
-                        ]
+                        JSON.parse(
+                            "[    {        \"type\": \"h1\",        \"content\": \"Computer Science Student Anish Thapa Profile\"    },    {        \"type\": \"div\",        \"content\": \"A highly motivated and passionate Computer Science student,\\n demonstrating determination and excellent organization skills. A proven problem-solver, I have made code optimizations resulting in 25% memory usage reduction. Experienced in software engineering, interning at Doodle Learning, and participating in the Edinburgh University Formula Student (EUFS), I strive to develop my skillset.\"    },    {        \"type\": \"h2\",        \"content\": \"Experience\"    },    {        \"type\": \"div\",        \"content\": \"Software Engineer Intern, Doodle Learning; Bath, UK — May 2022 – September 2022: Invited to re-intern and became the most appreciated employee on 15Five. Worked on test engineering (Robot Framework) and new App features, such as Remote Config implementation. Experienced a company acquisition, as Discovery Education acquired the firm in my last month of internship.\"    },    {        \"type\": \"div\",        \"content\": \"Software Infrastructure Engineer, EUFS; Edinburgh, UK — October 2021 – May 2022: Worked in the infrastructure team, developing coding skills in ROS (Python and C++) and using Gazebo for making accurate car simulations. Contributed to upgrading the bicycle model to a four wheel model, resulting in more accurate car simulations and a win in the simulation category.\"    },    {        \"type\": \"div\",        \"content\": \"Software Engineer Intern, Doodle Learning; Bath, UK — May 2021 – September 2021: Gained proficiency in C#, debugging code, and implementing new features. Demonstrated team working skills by participating in code reviews and pair programming. Completed time-critical tasks before the next version release by fixing critical bugs. Reduced overall memory usage by 25% through making code optimizations.\"    },    {        \"type\": \"h2\",        \"content\": \"Projects\"    },    {        \"type\": \"bullet\",        \"content\": \"Turn-based Strategy Game (Python, PyGame) – created a game involving four players, four different unit types and balancing for an enjoyable experience. Sudoku Solver (Python) – developed a solver that transforms a 2D representation of the board into a solved 2D list, with a GUI version to show the backtracking process. Tic-Tac-Toe AI (Python) – created an AI that returns the best possible move, given a 2D representation of a tic-tac-toe board, and allowing for the option to play against the AI.\"    },    {        \"type\": \"h2\",        \"content\": \"Education\"    },    {        \"type\": \"div\",        \"content\": \"Kingswood School, Bath, UK — A Level Maths, F.Maths, CS, Physics 2018-2020 (A*, A, A, A). University of Edinburgh, Edinburgh, UK — BSc Computer Science 2020-2024 (Average First Year 1 & 2).\"    },    {        \"type\": \"h2\",        \"content\": \"Skills Relevant to Job Posting\"    },    {        \"type\": \"bullet\",        \"content\": \"JavaScript, Node.js, React & Unity – two 5-month internships with Doodle Learning. C++ and ROS – used in working as a Software Engineer for Formula Student. Python – started learning since 2013 and further developed in A Levels and university modules. Java, C and Haskell – learned through university modules. Jira & Git – used extensively during the internship and while working as a Software Engineer at Formula Student.\"    },    {        \"type\": \"div\",        \"content\": \"New Road, Stoke Gifford, Bristol | 07869 405140 | anishsarum@gmail.com\"    }]"
+                        )
                     }/>
-                </PDFViewer> */}
+                </PDFViewer>
             </div>
         </>
     )
