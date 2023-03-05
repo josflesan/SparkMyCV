@@ -148,11 +148,15 @@ export function useCVs() {
 					response
 				)
 	
-				// Repair JSON for both CV and metadata
-				const repairedResponse = {
-					cv: JSON.parse(jsonrepair(Buffer.from(response.cv, 'utf-8').toString().trim())),
-					metadata: JSON.parse(jsonrepair(Buffer.from(response.metadata, 'utf-8').toString().trim()))
-				}
+				// try {
+									// Repair JSON for both CV and metadata
+					const repairedResponse = {
+						cv: JSON.parse(jsonrepair(Buffer.from(response.cv, 'utf-8').toString().trim())),
+						metadata: JSON.parse(jsonrepair(Buffer.from(response.metadata, 'utf-8').toString().trim()))
+					}
+				// } catch (e) {
+
+				// }
 	
 				const parsedResponse = enhanceResponseParsedSchema.parse(repairedResponse)
 				console.log(parsedResponse)

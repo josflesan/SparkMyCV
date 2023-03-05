@@ -63,12 +63,7 @@ class CVFormatter:
                 "company_name"], summary_output["job_position"]
 
             cv_body = " ".join(cv_pages)  # Join all pages together naively
-            message = f'''This is a sample document for a CV customization service, where we rewrite CVs to fit job postings. Our edit retains the original facts of original CV, but rewrites and reorganizes to priortize relevant experiences, as we do not know experiences that the user has not provided.\n
-                        This is the applicant's CV:\n\n
-                        {cv_body}\n\n
-                        This is a summary of our job posting:\n\n
-                        {summarised_job_posting}\n\n
-                        This is our rewritten version of the CV that has been customized to fit the job posting, including an introduction and correcting for a professional tone, with better formatting. Also a summary of the edits made.'''
+            message = f'''[DESCRIPTION]This is a sample document for a CV customization service, where we rewrite CVs to fit job postings. Our edit retains the original facts of original CV, but rewrites and reorganizes to priortize relevant experiences, as we do not know experiences that the user has not provided. The CV will be rewritten to fit the job posting, including an introduction and correcting for a professional tone, with better formatting. Also a summary of the edits made.[APPLICANT CV PLAINTEXT]{cv_body}[JOB POST SUMMARY]{summarised_job_posting}[RESULTANT REWRITTEN RESUME]'''
             response = openai.Completion.create(
                 model="text-davinci-003",
                 prompt=message,
@@ -78,6 +73,7 @@ class CVFormatter:
             return response["choices"][0]["text"]
         
         except Exception as e:
+            print(e)
             return f"Error: {e}"
 
     @staticmethod
@@ -128,6 +124,7 @@ class CVFormatter:
             return output
 
         except Exception as e:
+            print(e)
             return f"Error: {e}"
 
     @staticmethod
@@ -149,12 +146,7 @@ class CVFormatter:
             "edits": ["Edit 1 made to the CV", "Edit 2 made to the CV"]
         }
         '''
-        prompt = f'''The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}", and afterwards write list of edits and their justification:\n\n
-                     {cv_file}\n\n
-                     This is the schema for a JSON representation of the metadata for the job posting:\n\n
-                     {metadata_schema}\n\n
-                     This is a JSON object containing metadata following the schema above:
-                  '''
+        prompt = f'''[DESCRIPTION]The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}", and also write a structured list of edits and their justification using the provided schema {cv_file}[JSON SCHEMA]{metadata_schema}[RESULTANT JSON]'''
 
         try:
             response = openai.Completion.create(
@@ -169,6 +161,7 @@ class CVFormatter:
             return output
         
         except Exception as e:
+            print(e)
             return f"Error: {e}"
 
     @staticmethod
@@ -196,13 +189,13 @@ class CVFormatter:
         export type RawCVObject = RawCVComponentObject[]
         '''
 
-        prompt = f'''[TASK]The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}"[CV UNSTRUCTURED]{cv_file}[STRUCTURED FORMAT INFORMATION]Typescript declarations:{schema_cv_ts}The document has been formatted to be as easily readable as possible, and has edit notes removed. The output must be minified such that there are no extra whitespaces or newlines like the following:{schema_cv_json}[PARSED JSON]'''
+        prompt = f'''[TASK]The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}"[CV UNSTRUCTURED]{cv_file}[STRUCTURED FORMAT INFORMATION]Typescript declarations:{schema_cv_ts}The document has been formatted to be as easily readable as possible, and has edit notes removed. The output must be minified such that there are no extra whitespaces or newlines like the following:{schema_cv_json} It will follow the RawCVObject syntax, which is an array of RawCVComponentObject objects.[PARSED JSON FROM UNSTRUCTURED CV]'''
 
         try:
             response = openai.Completion.create(
                 model="text-davinci-003",
                 prompt=prompt,
-                max_tokens=2500
+                max_tokens=2100
             )
 
             output = response['choices'][0]['text']
@@ -211,4 +204,5 @@ class CVFormatter:
         
             return {"result": output}
         except Exception as e:
+            print (e)
             return {"err": f"Error: {e}"}
