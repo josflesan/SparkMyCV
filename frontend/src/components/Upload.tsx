@@ -8,6 +8,7 @@ import { useAPI } from "../APIProvider";
 import { AppContext, CVs, ModifiedCV, ModifiedCVState } from "../App";
 import { PDFDownloadLink, PDFViewer, usePDF } from "@react-pdf/renderer";
 import { CVDocument } from "./renderer/CVRenderer";
+import { TypeAnimation } from 'react-type-animation';
 
 // function useCVList() {
 //     // addRequest - adds a request / pending CV to the list
@@ -55,6 +56,7 @@ function FileUploader() {
                                 >
                                     <input {...getInputProps()} />
                                     <p>Click to upload your resume 👆</p>
+
                                 </div>
                             </div>
                         )}
@@ -138,7 +140,7 @@ function Job({ cv, id }: { cv: ModifiedCVState, id: string }) {
             {
                 ((cv.results !== null) && showInspect) ? (
                     <div className="p-2">
-                        {
+                        {/* {
                             cv.results.edits.map((edit, index) => (
                                 <div key={index} className="flex flex-row">
                                     <div className="pr-4">•</div>
@@ -147,6 +149,9 @@ function Job({ cv, id }: { cv: ModifiedCVState, id: string }) {
                                     </div>
                                 </div>
                             ))
+                        } */}
+                        {
+                            
                         }
                     </div>
                 ) : null
@@ -299,9 +304,38 @@ export default function Upload() {
             <h1 className='text-6xl font-serif font-[700] text-bold'>
                 ✨ your CV.
             </h1>
-            <div>
+            {/* <div>
                 Upload your CV and job posting URLs, and we'll ✨ your CV to match each job posting.
-            </div>
+            </div> */}
+            <TypeAnimation
+                sequence={[
+                "Upload your CV and job posting URLs, and we'll ✨ your CV to match each job posting.",
+                10000,
+                'Upload your CV and let us do the ✨ magic, matching your CV to your dream job 🌟',
+                10000,
+                "Upload your CV, sit back and relax while we do the editing for you 🧘‍♀️",
+                10000,
+                "Upload your CV and let us give it the magic touch 🔮",
+                10000,
+                "Upload your CV and let us make it shine 🌟",
+                10000,
+                "Upload your CV and let us make it stand out 💥",
+                10000,
+                "Upload your CV and let us make it shine brighter 💡",
+                10000,
+                "Upload your CV and let us help you get your dream job 🤩",
+                10000,
+                "Upload your CV and let us help you find the job of your dreams 🤩",
+                10000,
+                "Upload your CV and let us help you get the job you deserve 🤩",
+                10000,
+                "Upload your CV and let us help you land your dream job 🤩",
+                10000
+                ]}
+                speed={50} // Custom Speed from 1-99 - Default Speed: 40
+                wrapper="span" // Animation will be rendered as a <span>
+                repeat={Infinity} // Repeat this Animation Sequence infinitely
+            />
             <div className="flex flex-col gap-4">
                 <FileUploader />
                 <div className="flex flex-col gap-4">

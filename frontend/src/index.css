@@ -28,5 +28,5 @@ h2 {
 }
 
 .hover-border {
-    @apply outline outline-black outline-1 hover:outline-4 transition-[outline];
+    @apply outline outline-1 hover:outline-4 transition-[outline];
 }

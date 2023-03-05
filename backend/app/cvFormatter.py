@@ -68,7 +68,7 @@ class CVFormatter:
                         {cv_body}\n\n
                         This is a summary of our job posting:\n\n
                         {summarised_job_posting}\n\n
-                        This is our rewritten version of the CV that has been customized to fit the job posting, correcting for a professional tone, and better formatting. Also a summary of the edits made.'''
+                        This is our rewritten version of the CV that has been customized to fit the job posting, including an introduction and correcting for a professional tone, with better formatting. Also a summary of the edits made.'''
             response = openai.Completion.create(
                 model="text-davinci-003",
                 prompt=message,
@@ -149,7 +149,7 @@ class CVFormatter:
             "edits": ["Edit 1 made to the CV", "Edit 2 made to the CV"]
         }
         '''
-        prompt = f'''The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}", followed by a list of edits and their justification:\n\n
+        prompt = f'''The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}", and in a seperate section, list of edits and their justification:\n\n
                      {cv_file}\n\n
                      This is the schema for a JSON representation of the metadata for the job posting:\n\n
                      {metadata_schema}\n\n
@@ -196,7 +196,7 @@ class CVFormatter:
         export type RawCVObject = RawCVComponentObject[]
         '''
 
-        prompt = f'''[TASK]The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}"[CV UNSTRUCTURED]{cv_file}[STRUCTURED FORMAT INFORMATION]Typescript declarations:{schema_cv_ts}The document has been formatted to be as easily readable as possible, and must be minified such that there are no extra whitespaces or newlines like the following:{schema_cv_json}[PARSED JSON]'''
+        prompt = f'''[TASK]The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}"[CV UNSTRUCTURED]{cv_file}[STRUCTURED FORMAT INFORMATION]Typescript declarations:{schema_cv_ts}The document has been formatted to be as easily readable as possible, and has edit notes removed. The output must be minified such that there are no extra whitespaces or newlines like the following:{schema_cv_json}[PARSED JSON]'''
 
         try:
             response = openai.Completion.create(
