@@ -1,12 +1,17 @@
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
 import { render } from 'react-dom';
+import arimo from "../../assets/arimo.ttf?url"
+import nanum from "../../assets/nanum.ttf"
+import nanum_bold from "../../assets/nanum-bold.ttf"
+import nanum_extra_bold from "../../assets/nanum-extra-bold.ttf"
+import { nan } from 'zod';
 
 export type RawCVComponentObject = {
     type: "bullet" | "p" | "h1" | "h2" | "h3" | "div"
     content: RawCVComponentChildren
 }
 
-export type RawCVComponentChildren = string | ((RawCVComponentObject|string)[])
+export type RawCVComponentChildren = string | ((RawCVComponentObject | string)[])
 
 export type WithType<T, U> = T & { type: U }
 
@@ -15,36 +20,70 @@ export type RawCVObject = RawCVComponentObject[]
 const styles = StyleSheet.create({
     page: {
         flexDirection: 'column',
+        fontFamily: 'Arimo',
         padding: 20,
     },
     header: {
         fontSize: 24,
         fontWeight: 'bold',
+        fontFamily: 'Nanum',
         marginBottom: 10,
     },
     subheader: {
         fontSize: 18,
         fontWeight: 'bold',
+        fontFamily: 'Nanum',
         marginBottom: 10,
     },
     subsubheader: {
         fontSize: 14,
         fontWeight: 'bold',
+        fontFamily: 'Nanum',
         marginBottom: 10,
     },
     paragraph: {
         fontSize: 12,
         marginBottom: 10,
+        fontFamily: 'Arimo',
     },
-    row:{
+    row: {
         display: 'flex',
+        fontFamily: 'Arimo',
         flexDirection: 'row'
     },
-    bullet:{
+    bullet: {
         height: '100%',
+        fontFamily: 'Arimo',
         flexWrap: "nowrap"
     }
 });
+
+Font.register(
+    {
+        family: 'Arimo',
+        src: arimo
+    }
+)
+
+Font.register(
+    {
+        family: "Nanum",
+        fonts: [
+            {
+                src: nanum,
+                fontWeight: 400
+            },
+            {
+                src: nanum_bold,
+                fontWeight: 600
+            },
+            {
+                src: nanum_extra_bold,
+                fontWeight: 700
+            }
+        ]
+    }
+)
 
 function renderChildren(children: RawCVComponentChildren, parentType: RawCVComponentObject["type"]) {
     if (typeof children === "string") {
@@ -55,20 +94,21 @@ function renderChildren(children: RawCVComponentChildren, parentType: RawCVCompo
                 return <CVRendererAssigner key={index} cv={{
                     type: parentType,
                     content: child
-                }}/>
+                }} />
             } else {
-                return <CVRendererAssigner key={index} cv={child}/>
+                return <CVRendererAssigner key={index} cv={child} />
             }
         })
-}}
+    }
+}
 
-export function BulletItem({ children }: {children: string}) {
+export function BulletItem({ children }: { children: string }) {
     return (
         <View style={styles.row} wrap={false}>
             <View style={styles.bullet} wrap={false}>
                 <Text>{'\u2022' + " "}</Text>
             </View>
-            <Text>{children}</Text>
+            <Text>{`${children}\n`}</Text>
         </View>
     )
 }
@@ -78,7 +118,7 @@ export function BulletRenderer({ content }: WithType<RawCVComponentObject, "bull
     return (
         <Text style={styles.paragraph}>
             {
-                (typeof children==="string") ? <BulletItem>
+                (typeof children === "string") ? <BulletItem>
                     {children}
                 </BulletItem> : children
             }
@@ -87,9 +127,12 @@ export function BulletRenderer({ content }: WithType<RawCVComponentObject, "bull
 }
 
 export function PRenderer({ content }: WithType<RawCVComponentObject, "p">) {
+    const children = renderChildren(content, "p")
     return (
         <Text style={styles.paragraph}>
-            {renderChildren(content, "p")}
+            {
+                (typeof children === "string") ? `${children}\n` : children
+            }
         </Text>
     )
 }
