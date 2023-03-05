@@ -226,6 +226,7 @@ class CVFormatter:
             }
         }
         output = response['choices'][0]['text']
+        print(f"Raw Output String: {output}")
         output = remove_newlines(output)  # Get rid of newlines for valid JSON
 
         try:
