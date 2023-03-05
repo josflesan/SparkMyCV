@@ -66,5 +66,3 @@ def validate_schema(schema: str = default_schema, data: str = default_schema):
         return False
     
     return True
-
-print(validate_schema())
