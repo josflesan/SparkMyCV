@@ -210,12 +210,33 @@ class CVFormatter:
         export type RawCVObject = RawCVComponentObject[]
         '''
 
+        example_desired_output = '''
+        [
+            {
+                "type": "div",
+                "content": [
+                    {
+                        "type": "h2",
+                        "content": "Profile"
+                    },
+                    {
+                        "type": "p",
+                        "content": "This is the applicant's profile"
+                    }
+                ]
+            }
+        ]
+        '''
+
         prompt = f'''The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}", followed by a list of edits and their justification:\n\n
                       {cv_file}\n\n
                       This is the schema for a JSON representation of the CV:\n\n                      
                       {schema_cv_json}\n\n
                       The same schema is presented below as it would appear in TypeScript:\n\n
                       {schema_cv_ts}\n\n
+                      Each section should be a div element with at least a heading and another component. List elements should use the 'bullet' component. For example, a partial desired output could look like this...
+                      {example_desired_output}
+
                       The following is a JSON object representing the CV using this schema:'''
         response = openai.Completion.create(
             model="text-davinci-003",

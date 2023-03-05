@@ -46,6 +46,10 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         fontFamily: 'Arimo',
     },
+    container: {
+        display: "flex",
+        flexDirection: 'column'
+    },
     row: {
         display: 'flex',
         fontFamily: 'Arimo',
@@ -117,7 +121,7 @@ function BulletRenderer({ content }: WithType<RawCVComponentObject, "bullet">) {
     const children = renderChildren(content, "bullet")
     return (
         <Text style={styles.paragraph}>
-            {
+            {   
                 (typeof children === "string") ? <BulletItem>
                     {children}
                 </BulletItem> : children
@@ -130,14 +134,31 @@ function PRenderer({ content }: WithType<RawCVComponentObject, "p">) {
     const children = renderChildren(content, "p")
     return (
         <Text style={styles.paragraph}>
-            {
-                (typeof children === "string") ? `${children}\n` : children
-            }
+        {
+            (typeof children === "string") ? `${children}\n` : children
+        }
         </Text>
     )
 }
 
+export function DivRenderer({ content }: WithType<RawCVComponentObject, "div">) {
+    const children = renderChildren(content, "div")
+    return (
+        <View style={styles.container}>
+            {
+                (typeof children === "string") ? <Text style={styles.paragraph}>{`${children}\n`}</Text> :
+                children
+            }
+        </View>
+    )
+}
+
+<<<<<<< Updated upstream
 function H1Renderer({ content }: WithType<RawCVComponentObject, "h1">) {
+=======
+
+export function H1Renderer({ content }: WithType<RawCVComponentObject, "h1">) {
+>>>>>>> Stashed changes
     return (
         <Text style={styles.header}>
             {renderChildren(content, "h1")}
@@ -156,6 +177,7 @@ function H2Renderer({ content }: WithType<RawCVComponentObject, "h2">) {
 function H3Renderer({ content }: WithType<RawCVComponentObject, "h3">) {
     return (
         <Text style={styles.subsubheader}>
+            {'\n'}
             {renderChildren(content, "h3")}
         </Text>
     )
@@ -174,7 +196,7 @@ function CVRendererAssigner({ cv }: { cv: RawCVComponentObject }): JSX.Element {
         case "h3":
             return <H3Renderer {...cv as WithType<RawCVComponentObject, "h3">} />
         case "div":
-            return <PRenderer {...cv as WithType<RawCVComponentObject, "p">} /> // Hack!
+            return <DivRenderer {...cv as WithType<RawCVComponentObject, "div">} /> // Hack!
     }
 }
 
