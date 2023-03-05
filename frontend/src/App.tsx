@@ -4,6 +4,8 @@ import { Configuration, DefaultApi } from './api';
 import { APIProvider, useAPI } from './APIProvider';
 import { RawCVComponentObject, RawCVObject } from './components/renderer/CVRenderer';
 import { z } from 'zod';
+import { jsonrepair } from 'jsonrepair';
+import { Buffer } from 'buffer';
 
 export type ModifiedCV = {
     company: string,
@@ -86,18 +88,25 @@ export function useCVs() {
 			}
 			console.log(request);
 			// Send request to server, and when it comes back, update the state (if it still exists)
-			// const response = await api.enhanceCvEnhancePost(request)
-			const rawResponse = await api.getDummyRenderDummyGet()
+			const rawResponse = await api.enhanceCvEnhancePost(request)
+			// const rawResponse = await api.getDummyRenderDummyGet()
 			console.log(rawResponse)
 			const response = {
-				cv: JSON.parse((rawResponse as any).data.cv.trim()),
-				metadata: JSON.parse((rawResponse as any).data.metadata.trim())
+				cv: (rawResponse as any).data.cv,
+				metadata: (rawResponse as any).data.metadata
 			}
 			// Let's check against the schema
 			console.log(
 				response
 			)
-			const parsedResponse = enhanceResponseSchema.parse(response)
+
+      // Repair JSON for both CV and metadata
+      const repairedResponse = {
+        cv: JSON.parse(jsonrepair(Buffer.from(response.cv, 'utf-8').toString().trim())),
+        metadata: JSON.parse(jsonrepair(Buffer.from(response.metadata, 'utf-8').toString().trim()))
+      }
+
+			const parsedResponse = enhanceResponseSchema.parse(repairedResponse)
 			console.log(parsedResponse)
 			setCvs((cvs: CVs) => {
 				if (cvs[id]) {

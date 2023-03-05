@@ -69,6 +69,8 @@ class CVFormatter:
             max_tokens=1417
         )
 
+        print(response["choices"][0]["text"])
+
         return response["choices"][0]["text"]
 
     @staticmethod
@@ -129,9 +131,18 @@ class CVFormatter:
             response (dict): JSON response containing formatted metadata
         """
 
+        metadata_schema = '''
+        {
+            "job_posting_title": "The title of the job posting",
+            "company_name": "The name of the company that posted the job listing",
+            "edits": ["Edit 1 made to the CV", "Edit 2 made to the CV"]
+        }
+        '''
         prompt = f'''The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}", followed by a list of edits and their justification:\n\n
                      {cv_file}\n\n
-                     This is a JSON object containing metadata including job posting title, company name and list of edits:
+                     This is the schema for a JSON representation of the metadata for the job posting:\n\n
+                     {metadata_schema}\n\n
+                     This is a JSON object containing metadata following the schema above:
                   '''
         
         response = openai.Completion.create(
@@ -158,11 +169,16 @@ class CVFormatter:
             response (dict): JSON response containing formatted CV
         """
 
-        schema_cv = '''
+        schema_cv_json = '''
         [
             {
                 "type": "div",
-                "content": ["Applicant name", "Applicant contacts"]
+                "content": [
+                    "p": "Applicant Name",
+                    "p": "Applicant Email",
+                    "p": "Applicant Address",
+                    "p": "Applicant Phone Number",
+                ]
             },
             {
                 "type": "h1",
@@ -178,53 +194,35 @@ class CVFormatter:
             },
             {
                 "type": "bullet",
-                "content": ["Point 1", "Point 2"]
+                "content": ["Skill 1", "Skill 2"]
             }
-        ]       
+        ]
+        '''
+
+        schema_cv_ts = '''
+        export type RawCVComponentObject = {
+            type: "bullet" | "p" | "h1" | "h2" | "h3" | "div"
+            content: RawCVComponentChildren
+        }
+
+        export type RawCVComponentChildren = string | ((RawCVComponentObject | string)[])
+
+        export type RawCVObject = RawCVComponentObject[]
         '''
 
         prompt = f'''The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}", followed by a list of edits and their justification:\n\n
                       {cv_file}\n\n
-                      This the schema for a JSON representation of the CV:\n\n
-                      {schema_cv}\n\n
-                      The following is a JSON object containing a JSON representation of the CV following that schema:'''
+                      This is the schema for a JSON representation of the CV:\n\n                      
+                      {schema_cv_json}\n\n
+                      The same schema is presented below as it would appear in TypeScript:\n\n
+                      {schema_cv_ts}\n\n
+                      The following is a JSON object representing the CV using this schema:'''
         response = openai.Completion.create(
             model="text-davinci-003",
             prompt=prompt,
-            max_tokens=2110
+            max_tokens=2048
         )
 
-        json_output_schema ={
-            "cv": [
-                [
-                    {
-                        "type": "div",
-                        "content": ["Applicant Name", "Applicant contacts"]
-                    },
-                    {
-                        "type": "h1",
-                        "content": "Heading"
-                    },
-                    {
-                        "type": "div",
-                        "content": "This is some body text"
-                    },
-                    {
-                        "type": "h2",
-                        "content": "Skills"
-                    },
-                    {
-                        "type": "bullet",
-                        "content": ["Skill 1", "Skill 2"]
-                    }
-                ]
-            ],
-            "metadata": {
-                "job_posting": "Job Posting Title",
-                "company": "Company Name",
-                "edits": ["Edit 1", "Edit 2"]
-            }
-        }
         output = response['choices'][0]['text']
         print(f"Raw Output String: {output}")
         output = remove_newlines(output)  # Get rid of newlines for valid JSON
