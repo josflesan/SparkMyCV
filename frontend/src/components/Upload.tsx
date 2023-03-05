@@ -27,7 +27,7 @@ import { CVDocument } from "./renderer/CVRenderer";
 
 function FileUploader() {
     const { setOriginalCV, originalCV } = useContext(AppContext);
-    return <div className="container p-8 cursor-pointer hover-border">
+    return <div className="container p-8 cursor-pointer hover-border rounded-xl">
         {
             originalCV ? (
                 <div onClick={() => {
@@ -76,7 +76,7 @@ function JobURLPrompt() {
             urlInputRef.current.value = "";
         }
     }}>
-        <form className="w-full overflow-clip flex flex-row hover-border">
+        <form className="w-full overflow-clip flex flex-row hover-border rounded-xl">
             <input ref={urlInputRef} type="text" name="jobURL" className="grow px-2" onChange={(e) => setFilled(e.target.value.length > 0)} placeholder="Paste a URL for a job posting..." />
             <button className="px-4" disabled={!filled}>+</button>
         </form>
