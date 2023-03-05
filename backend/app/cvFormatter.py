@@ -143,5 +143,5 @@ class CVFormatter:
             max_tokens=2110
         )
 
-        return response
+        return {"response": response['choices'][0]['text']}
 
