@@ -10,7 +10,8 @@ import { Buffer } from 'buffer';
 export type ModifiedCV = {
     company: string,
     jobTitle: string,
-    modifiedCV: RawCVObject
+    modifiedCV: RawCVObject,
+	edits: string[]
 }
 
 export type ModifiedCVState = {
@@ -57,7 +58,8 @@ export function useCVs() {
 	// 		results: {
 	// 			company: "Google",
 	// 			jobTitle: "Software Engineer",
-	// 			modifiedCV: []
+	// 			modifiedCV: [],
+	// 			edits: ["Enhanced personality", "Hi"]
 	// 		},
 	// 		error: null
 	// 	},
@@ -142,7 +144,8 @@ export function useCVs() {
 							results: {
 								company: parsedResponse.metadata.company_name,
 								jobTitle: parsedResponse.metadata.job_posting_title,
-								modifiedCV: parsedResponse.cv as RawCVObject
+								modifiedCV: parsedResponse.cv as RawCVObject,
+								edits: parsedResponse.metadata.edits
 							}
 						}
 					}
@@ -154,8 +157,16 @@ export function useCVs() {
 		}
 	}, [api, originalCVHash]);
 
-	const updateCV = useCallback((id: number, newCV: RawCVObject) => {
-		
+	const updateCV = useCallback((id: string, newCV: RawCVObject) => {
+		if (cvs[id].results !== null) {
+			setCvs((oldCvs)=>({...oldCvs, [id]: {
+				...cvs[id] as ModifiedCVState,
+				results: {
+					...cvs[id].results as ModifiedCV,
+					modifiedCV: newCV
+				}
+			}}))
+		}
 	}, [])
 
 	const deleteCV = useCallback((id: string) => {
@@ -172,6 +183,7 @@ export function useCVs() {
 		originalCV,
 		addRequest,
 		deleteCV,
+		updateCV
 	}
 }
 

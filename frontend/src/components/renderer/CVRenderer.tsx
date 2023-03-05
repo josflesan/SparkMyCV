@@ -102,7 +102,7 @@ function renderChildren(children: RawCVComponentChildren, parentType: RawCVCompo
     }
 }
 
-export function BulletItem({ children }: { children: string }) {
+function BulletItem({ children }: { children: string }) {
     return (
         <View style={styles.row} wrap={false}>
             <View style={styles.bullet} wrap={false}>
@@ -113,7 +113,7 @@ export function BulletItem({ children }: { children: string }) {
     )
 }
 
-export function BulletRenderer({ content }: WithType<RawCVComponentObject, "bullet">) {
+function BulletRenderer({ content }: WithType<RawCVComponentObject, "bullet">) {
     const children = renderChildren(content, "bullet")
     return (
         <Text style={styles.paragraph}>
@@ -126,7 +126,7 @@ export function BulletRenderer({ content }: WithType<RawCVComponentObject, "bull
     )
 }
 
-export function PRenderer({ content }: WithType<RawCVComponentObject, "p">) {
+function PRenderer({ content }: WithType<RawCVComponentObject, "p">) {
     const children = renderChildren(content, "p")
     return (
         <Text style={styles.paragraph}>
@@ -137,7 +137,7 @@ export function PRenderer({ content }: WithType<RawCVComponentObject, "p">) {
     )
 }
 
-export function H1Renderer({ content }: WithType<RawCVComponentObject, "h1">) {
+function H1Renderer({ content }: WithType<RawCVComponentObject, "h1">) {
     return (
         <Text style={styles.header}>
             {renderChildren(content, "h1")}
@@ -145,7 +145,7 @@ export function H1Renderer({ content }: WithType<RawCVComponentObject, "h1">) {
     )
 }
 
-export function H2Renderer({ content }: WithType<RawCVComponentObject, "h2">) {
+function H2Renderer({ content }: WithType<RawCVComponentObject, "h2">) {
     return (
         <Text style={styles.subheader}>
             {renderChildren(content, "h2")}
@@ -153,7 +153,7 @@ export function H2Renderer({ content }: WithType<RawCVComponentObject, "h2">) {
     )
 }
 
-export function H3Renderer({ content }: WithType<RawCVComponentObject, "h3">) {
+function H3Renderer({ content }: WithType<RawCVComponentObject, "h3">) {
     return (
         <Text style={styles.subsubheader}>
             {renderChildren(content, "h3")}
@@ -161,7 +161,7 @@ export function H3Renderer({ content }: WithType<RawCVComponentObject, "h3">) {
     )
 }
 
-export function CVRendererAssigner({ cv }: { cv: RawCVComponentObject }): JSX.Element {
+function CVRendererAssigner({ cv }: { cv: RawCVComponentObject }): JSX.Element {
     switch (cv.type) {
         case "bullet":
             return <BulletRenderer {...cv as WithType<RawCVComponentObject, "bullet">} />

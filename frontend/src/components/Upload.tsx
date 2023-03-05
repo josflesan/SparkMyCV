@@ -1,8 +1,8 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import Dropzone from 'react-dropzone';
-import { GrTrash } from "react-icons/gr";
+import { GrEdit, GrInspect, GrTrash } from "react-icons/gr";
 import { BiErrorAlt } from "react-icons/bi";
-import { GrInProgress, GrDownload} from "react-icons/gr";
+import { GrInProgress, GrDownload } from "react-icons/gr";
 import { AiOutlineCheck } from "react-icons/ai";
 import { useAPI } from "../APIProvider";
 import { AppContext, CVs, ModifiedCV, ModifiedCVState } from "../App";
@@ -85,22 +85,23 @@ function JobURLPrompt() {
 
 function Job({ cv, id }: { cv: ModifiedCVState, id: string }) {
     console.log(typeof id)
-    const {deleteCV} = useContext(AppContext)
+    const { deleteCV } = useContext(AppContext)
+    const [showInspect, setShowInspect] = useState(false);
     return (
-        <>
+        <div>
             <div className="flex flex-row gap-4">
                 <div className="flex-grow">
                     {
                         cv.processedState === "processing" ? (
                             <div className="px-2">
-                                <ProcessingText url={cv.url}/>
+                                <ProcessingText url={cv.url} />
                             </div>
                         ) : (
                             cv.processedState === "error" ? (
                                 <div className="px-2 text-red-700">
                                     <BiErrorAlt className="inline translate-y-[-1.5px]" />
                                     <div className="inline ml-2">
-                                        {`Error: ${cv.error}`}
+                                        {`Internal error occured, please try again.`}
                                     </div>
                                 </div>
                             ) : (
@@ -121,17 +122,40 @@ function Job({ cv, id }: { cv: ModifiedCVState, id: string }) {
                     }
                 </div>
                 {
-                    cv.results === null ? null : <DownloadIcon content={cv.results}/>
+                    cv.results === null ? null : (
+                        <>
+                            <GrInspect className="cursor-pointer" onClick={()=>{
+                                setShowInspect((x)=>(!x))
+                            }}></GrInspect>
+                            <DownloadIcon content={cv.results} />
+                        </>
+                    )
                 }
-                <GrTrash className="cursor-pointer translate-y-[-1.5px]" onClick={() => {
+                <GrTrash className="cursor-pointer" onClick={() => {
                     deleteCV(id)
-                }}/>
+                }} />
             </div>
+            {
+                ((cv.results !== null) && showInspect) ? (
+                    <div className="p-2">
+                        {
+                            cv.results.edits.map((edit, index) => (
+                                <div key={index} className="flex flex-row">
+                                    <div className="pr-4">•</div>
+                                    <div>
+                                    {edit}
+                                    </div>
+                                </div>
+                            ))
+                        }
+                    </div>
+                ) : null
+            }
             {/* {(cv.results !== null) ?
                 (<PDFViewer className="h-[1000px]">
                     <CVDocument content={cv.results?.modifiedCV} />
                 </PDFViewer>) : null} */}
-        </>
+        </div>
     )
 }
 
@@ -215,67 +239,54 @@ const processingText = [
 const ellipsis = [".", "..", "..."]
 
 function AnimatedEllipsis() {
-  const [index, setIndex] = useState(0);
+    const [index, setIndex] = useState(0);
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setIndex((index) => (index + 1) % ellipsis.length);
-    }, 500);
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setIndex((index) => (index + 1) % ellipsis.length);
+        }, 500);
 
-    return () => clearInterval(intervalId);
-  }, []);
+        return () => clearInterval(intervalId);
+    }, []);
 
-  return <span>{ellipsis[index]}</span>;
+    return <span>{ellipsis[index]}</span>;
 }
 
-function ProcessingText({url}: {url: string}) {
+function ProcessingText({ url }: { url: string }) {
     const [loadingIndex, setLoadingIndex] = useState<number>(0);
-    useEffect(()=>{
-        const interval = setInterval(()=>{
-            setLoadingIndex(()=>Math.floor(Math.random() * processingText.length))
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setLoadingIndex(() => Math.floor(Math.random() * processingText.length))
         }, 5000)
-    },[])
+    }, [])
     return (
         <div className="inline">
             <div className="flex flex-row flex-nowrap">
-            <div className="inline">
-                <div className="overflow-hidden whitespace-nowrap text-ellipsis w-64">
-                <GrInProgress className="inline mr-2"/>
-                    {`${url}`}
+                <div className="inline">
+                    <div className="overflow-hidden whitespace-nowrap text-ellipsis w-64">
+                        <GrInProgress className="inline mr-2 translate-y-[-1.5px]" />
+                        {`${url}`}
+                    </div>
+                </div>
+
+                <div className="inline">
+                    <span>
+                        {processingText[loadingIndex]}
+                    </span>
+                    <AnimatedEllipsis />
                 </div>
             </div>
-            
-            <div className="inline">
-                <span>
-                    {processingText[loadingIndex]}
-                </span>
-                <AnimatedEllipsis/>
-            </div>
         </div>
-        </div>
-        
+
     )
 }
 
-function downloadFile(url: string, filename: string) {
-    fetch(url)
-      .then(response => response.blob())
-      .then(blob => {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        link.click();
-        URL.revokeObjectURL(url);
-      });
-  }
-
-function DownloadIcon({content}: {content: ModifiedCV}) {
+function DownloadIcon({ content }: { content: ModifiedCV }) {
     // const [instance, updateInstance] = usePDF({ document: <CVDocument content={content.modifiedCV}/> });
     return (
-        <PDFDownloadLink document={<CVDocument content={content.modifiedCV}/>} fileName={(`${content.company}-${content.jobTitle}`).replace(" ","_")}>
+        <PDFDownloadLink document={<CVDocument content={content.modifiedCV} />} fileName={(`${content.company}-${content.jobTitle}`).replace(" ", "_")}>
             {({ blob, url, loading, error }) =>
-                loading ? null : <GrDownload/>
+                loading ? null : <GrDownload className="" />
             }
         </PDFDownloadLink>
     )
@@ -295,7 +306,7 @@ export default function Upload() {
                 <FileUploader />
                 <div className="flex flex-col gap-4">
                     {
-                        Object.entries(cvs).map(([id, cv]) => <Job key={id} id={id} cv={cv}/>)
+                        Object.entries(cvs).map(([id, cv]) => <Job key={id} id={id} cv={cv} />)
                     }
                 </div>
                 <JobURLPrompt />
