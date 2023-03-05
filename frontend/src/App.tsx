@@ -92,8 +92,8 @@ export function useCVs() {
 			// const rawResponse = await api.getDummyRenderDummyGet()
 			console.log(rawResponse)
 			const response = {
-				cv: JSON.parse((rawResponse as any).data.cv.trim()),
-				metadata: JSON.parse((rawResponse as any).data.metadata.trim())
+				cv: (rawResponse as any).data.cv,
+				metadata: (rawResponse as any).data.metadata
 			}
 			// Let's check against the schema
 			console.log(
@@ -102,8 +102,8 @@ export function useCVs() {
 
       // Repair JSON for both CV and metadata
       const repairedResponse = {
-        cv: jsonrepair(Buffer.from(response.cv, 'utf-8').toString()),
-        metadata: jsonrepair(Buffer.from(response.metadata, 'utf-8').toString())
+        cv: JSON.parse(jsonrepair(Buffer.from(response.cv, 'utf-8').toString().trim())),
+        metadata: JSON.parse(jsonrepair(Buffer.from(response.metadata, 'utf-8').toString().trim()))
       }
 
 			const parsedResponse = enhanceResponseSchema.parse(repairedResponse)
