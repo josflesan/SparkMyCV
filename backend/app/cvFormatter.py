@@ -162,7 +162,7 @@ class CVFormatter:
         [
             {
                 "type": "div",
-                "content": "Applicant name\nApplicant contacts"
+                "content": ["Applicant name", "Applicant contacts"]
             },
             {
                 "type": "h1",
@@ -178,7 +178,7 @@ class CVFormatter:
             },
             {
                 "type": "bullet",
-                "content": "Point 1\nPoint 2"
+                "content": ["Point 1", "Point 2"]
             }
         ]       
         '''
@@ -199,7 +199,7 @@ class CVFormatter:
                 [
                     {
                         "type": "div",
-                        "content": "Applicant Name\nApplicant contacts"
+                        "content": ["Applicant Name", "Applicant contacts"]
                     },
                     {
                         "type": "h1",
@@ -215,7 +215,7 @@ class CVFormatter:
                     },
                     {
                         "type": "bullet",
-                        "content": "Skill 1\nSkill 2"
+                        "content": ["Skill 1", "Skill 2"]
                     }
                 ]
             ],
