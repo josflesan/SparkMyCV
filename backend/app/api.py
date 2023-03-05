@@ -70,7 +70,7 @@ async def upload_file(cv_file: UploadFile) -> dict:
         file_store[filename_hash] = pages
 
     except Exception:
-        return {"err": "There was an error uploading the file"}
+        return {"err": "Error: There was an error uploading the file"}
     finally:
         cv_file.file.close()
 
@@ -89,7 +89,10 @@ async def check_file_exists(file_hash: str) -> dict:
     Returns:
         response (dict): JSON output with single 'response' key with Boolean value representing file existence
     """
-    return {"response": file_hash in file_store}
+    try:
+        return {"response": file_hash in file_store}
+    except Exception:
+        return {"err": "Error: The file hash does not exist or the file_store is corrupted"}
 
 @functools.cache
 @app.post("/enhance")
@@ -106,18 +109,22 @@ async def enhance_cv(data: EnhanceBody) -> dict:
         result (dict): result JSON with MarkDown format of enhanced CV
     """
 
-    # Get file from internal store
-    pdf_pages = file_store[data.file_hash]
+    try:
+        # Get file from internal store
+        pdf_pages = file_store[data.file_hash]
 
-    # Preprocess the CV
-    outputCV = CVFormatter.process_cv(pdf_pages, data.job_posting_url)
+        # Preprocess the CV
+        outputCV = CVFormatter.process_cv(pdf_pages, data.job_posting_url)
 
-    # Format CV into JSON output for rendering
-    formattedCV = CVFormatter.format_cv_file(outputCV)
-    formattedMetdata = CVFormatter.format_metadata(outputCV)
+        # Format CV into JSON output for rendering
+        formattedCV = CVFormatter.format_cv_file(outputCV)['result']
+        formattedMetdata = CVFormatter.format_metadata(outputCV)
 
-    return {"cv": formattedCV,
-            "metadata": formattedMetdata}
+        return {"cv": formattedCV,
+                "metadata": formattedMetdata}
+
+    except Exception as e:
+        return {"err": f"Error: {e}"}
 
 def custom_openapi():
     """

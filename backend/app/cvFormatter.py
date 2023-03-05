@@ -49,33 +49,36 @@ class CVFormatter:
             response (str): string representation of processed CV
         """
 
-        # Convert single url to text using scraper
-        webscraper = WebScraper()
-        job_posting_text = webscraper.get_text_from_url(job_posting_url)
+        try:
 
-        summary_output = CVFormatter.summarize_job_posting(job_posting_text)
-        # Convert JSON string to dict
-        summary_output = json.loads(summary_output)
-        summarised_job_posting = summary_output["summary"]
-        CVFormatter.CURRENT_COMPANY_NAME, CVFormatter.CURRENT_JOB_POSITION = summary_output[
-            "company_name"], summary_output["job_position"]
+            # Convert single url to text using scraper
+            webscraper = WebScraper()
+            job_posting_text = webscraper.get_text_from_url(job_posting_url)
 
-        cv_body = " ".join(cv_pages)  # Join all pages together naively
-        message = f'''This is a sample document for a CV customization service, where we rewrite CVs to fit job postings. Our edit retains the original facts of original CV, but rewrites and reorganizes to priortize relevant experiences, as we do not know experiences that the user has not provided.\n
-                      This is the applicant's CV:\n\n
-                      {cv_body}\n\n
-                      This is a summary of our job posting:\n\n
-                      {summarised_job_posting}\n\n
-                      This is our rewritten version of the CV that has been customized to fit the job posting, correcting for a professional tone, and better formatting. Also a summary of the edits made.'''
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=message,
-            max_tokens=1417
-        )
+            summary_output = CVFormatter.summarize_job_posting(job_posting_text)
+            # Convert JSON string to dict
+            summary_output = json.loads(summary_output)
+            summarised_job_posting = summary_output["summary"]
+            CVFormatter.CURRENT_COMPANY_NAME, CVFormatter.CURRENT_JOB_POSITION = summary_output[
+                "company_name"], summary_output["job_position"]
 
-        print(response["choices"][0]["text"])
+            cv_body = " ".join(cv_pages)  # Join all pages together naively
+            message = f'''This is a sample document for a CV customization service, where we rewrite CVs to fit job postings. Our edit retains the original facts of original CV, but rewrites and reorganizes to priortize relevant experiences, as we do not know experiences that the user has not provided.\n
+                        This is the applicant's CV:\n\n
+                        {cv_body}\n\n
+                        This is a summary of our job posting:\n\n
+                        {summarised_job_posting}\n\n
+                        This is our rewritten version of the CV that has been customized to fit the job posting, correcting for a professional tone, and better formatting. Also a summary of the edits made.'''
+            response = openai.Completion.create(
+                model="text-davinci-003",
+                prompt=message,
+                max_tokens=1417
+            )
 
-        return response["choices"][0]["text"]
+            return response["choices"][0]["text"]
+        
+        except Exception as e:
+            return f"Error: {e}"
 
     @staticmethod
     def summarize_job_posting(job_posting: str) -> str:
@@ -111,23 +114,21 @@ class CVFormatter:
         {sample_text}
         [PARSED MINIFIED OUTPUT]
         '''
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=prompt,
-            max_tokens=250
-        )
-
-        output = response["choices"][0]["text"]
-        output = remove_newlines(output)  # Get rid of newlines for valid JSON
 
         try:
-            # assert validate_schema(json_output_schema, output)  # Validate JSON according to desired output schema
+            response = openai.Completion.create(
+                model="text-davinci-003",
+                prompt=prompt,
+                max_tokens=250
+            )
+
+            output = response["choices"][0]["text"]
+            output = remove_newlines(output)  # Get rid of newlines for valid JSON
 
             return output
-        except AssertionError:
-            print("GPT sucks at JSON ffs")
+
         except Exception as e:
-            print(f"Something else fucked up: {e}")
+            return f"Error: {e}"
 
     @staticmethod
     def format_metadata(cv_file: str) -> str:
@@ -155,16 +156,20 @@ class CVFormatter:
                      This is a JSON object containing metadata following the schema above:
                   '''
 
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=prompt,
-            max_tokens=2110
-        )
+        try:
+            response = openai.Completion.create(
+                model="text-davinci-003",
+                prompt=prompt,
+                max_tokens=2110
+            )
 
-        output = response['choices'][0]['text']
-        output = remove_newlines(output)  # Get rid of newlines for valid JSON
+            output = response['choices'][0]['text']
+            output = remove_newlines(output)  # Get rid of newlines for valid JSON
 
-        return output
+            return output
+        
+        except Exception as e:
+            return f"Error: {e}"
 
     @staticmethod
     def format_cv_file(cv_file: str) -> dict:
@@ -192,21 +197,18 @@ class CVFormatter:
         '''
 
         prompt = f'''[TASK]The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}"[CV UNSTRUCTURED]{cv_file}[STRUCTURED FORMAT INFORMATION]Typescript declarations:{schema_cv_ts}The document has been formatted to be as easily readable as possible, and must be minified such that there are no extra whitespaces or newlines like the following:{schema_cv_json}[PARSED JSON]'''
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=prompt,
-            max_tokens=2048
-        )
-
-        output = response['choices'][0]['text']
-        print(f"Raw Output String: {output}")
-        output = remove_newlines(output)  # Get rid of newlines for valid JSON
 
         try:
-            # assert validate_schema(json_output_schema, output)  # Validate JSON according to desired output schema
+            response = openai.Completion.create(
+                model="text-davinci-003",
+                prompt=prompt,
+                max_tokens=2500
+            )
 
-            return output
-        except AssertionError:
-            print("GPT sucks at JSON ffs")
+            output = response['choices'][0]['text']
+            print(f"Raw Output String: {output}")
+            output = remove_newlines(output)  # Get rid of newlines for valid JSON
+        
+            return {"result": output}
         except Exception as e:
-            print(f"Something else fucked up: {e}")
+            return {"err": f"Error: {e}"}
