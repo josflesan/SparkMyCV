@@ -19,7 +19,7 @@ export type ModifiedCVState = {
 }
 
 export type CVs = {
-	[id: number]: ModifiedCVState
+	[id: string]: ModifiedCVState
 }
 
 export const enhanceResponseSchema = z.object({
@@ -68,7 +68,7 @@ export function useCVs() {
 		}
 		if (api !== null) {
 			// Add a request to the list as processing
-			const id = idRef.current++;
+			const id = `${idRef.current++}`;
 			setCvs((cvs: CVs) => {
 				return {
 					...cvs,
@@ -121,7 +121,11 @@ export function useCVs() {
 		}
 	}, [api, originalCVHash]);
 
-	const deleteCV = useCallback((id: number) => {
+	const updateCV = useCallback((id: number, newCV: RawCVObject) => {
+		
+	}, [])
+
+	const deleteCV = useCallback((id: string) => {
 		setCvs((cvs: CVs) => {
 			const newCVs = { ...cvs };
 			delete newCVs[id];
@@ -176,7 +180,7 @@ function App() {
 	return (
 		<APIProvider url='http://localhost:8020'>
 			<AppContextProvider>
-				<div className='flex flex-col gap-8 w-[800px] m-4'>
+				<div className='flex flex-col gap-8 w-[800px] m-10'>
 					<Upload/>
 				</div>
 			</AppContextProvider>
