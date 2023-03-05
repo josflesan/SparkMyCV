@@ -26,15 +26,15 @@ import { CVDocument } from "./renderer/CVRenderer";
 // }
 
 function FileUploader() {
-    const { setOriginalCV, originalCV } = useContext(AppContext);
-    return <div className="container p-8 cursor-pointer hover-border rounded-xl">
+    const { setOriginalCV, originalCV, reset } = useContext(AppContext);
+    return <div className="container cursor-pointer hover-border rounded-xl">
         {
             originalCV ? (
-                <div onClick={() => {
-                    console.log("Clicked");
-                    setOriginalCV(null);
+                <div className="p-8" onClick={() => {
+                    reset()
+                    setOriginalCV(null)
                 }}>
-                    CV uploaded. Click to change.
+                    CV uploaded. Please add job postings, or click here to reset.
                 </div>
             ) :
                 (
@@ -46,15 +46,15 @@ function FileUploader() {
                     }}>
                         {({ getRootProps, getInputProps }) => (
                             // Center all content
-                            <div className="">
+                            <div>
                                 <div
                                     {...getRootProps({
                                         className: 'dropzone',
                                         onDrop: event => event.stopPropagation()
-                                    })}
+                                    })} className="p-8"
                                 >
                                     <input {...getInputProps()} />
-                                    <p>Drop your CV here ↓</p>
+                                    <p>Click to upload your resume 👆</p>
                                 </div>
                             </div>
                         )}
@@ -300,7 +300,7 @@ export default function Upload() {
                 ✨ your CV.
             </h1>
             <div>
-                Upload your CV and job posting URLs, and we'll rewrite your CV to match each job posting.
+                Upload your CV and job posting URLs, and we'll ✨ your CV to match each job posting.
             </div>
             <div className="flex flex-col gap-4">
                 <FileUploader />

@@ -153,12 +153,8 @@ export function DivRenderer({ content }: WithType<RawCVComponentObject, "div">) 
     )
 }
 
-<<<<<<< Updated upstream
-function H1Renderer({ content }: WithType<RawCVComponentObject, "h1">) {
-=======
 
 export function H1Renderer({ content }: WithType<RawCVComponentObject, "h1">) {
->>>>>>> Stashed changes
     return (
         <Text style={styles.header}>
             {renderChildren(content, "h1")}

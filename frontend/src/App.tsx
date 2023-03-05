@@ -177,13 +177,18 @@ export function useCVs() {
 		})
 	}, [setCvs]);
 
+	const reset = useCallback(()=>{
+		setCvs({})
+	},[])
+
 	return {
 		cvs,
 		setOriginalCV,
 		originalCV,
 		addRequest,
 		deleteCV,
-		updateCV
+		updateCV,
+		reset
 	}
 }
 

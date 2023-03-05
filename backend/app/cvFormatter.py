@@ -13,6 +13,7 @@ import json
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+
 def remove_newlines(string):
     in_quotes = False
     new_string = ""
@@ -28,6 +29,7 @@ def remove_newlines(string):
         else:
             new_string += char
     return new_string
+
 
 class CVFormatter:
 
@@ -52,9 +54,11 @@ class CVFormatter:
         job_posting_text = webscraper.get_text_from_url(job_posting_url)
 
         summary_output = CVFormatter.summarize_job_posting(job_posting_text)
-        summary_output = json.loads(summary_output)  # Convert JSON string to dict
+        # Convert JSON string to dict
+        summary_output = json.loads(summary_output)
         summarised_job_posting = summary_output["summary"]
-        CVFormatter.CURRENT_COMPANY_NAME, CVFormatter.CURRENT_JOB_POSITION = summary_output["company_name"], summary_output["job_position"]
+        CVFormatter.CURRENT_COMPANY_NAME, CVFormatter.CURRENT_JOB_POSITION = summary_output[
+            "company_name"], summary_output["job_position"]
 
         cv_body = " ".join(cv_pages)  # Join all pages together naively
         message = f'''This is a sample document for a CV customization service, where we rewrite CVs to fit job postings. Our edit retains the original facts of original CV, but rewrites and reorganizes to priortize relevant experiences, as we do not know experiences that the user has not provided.\n
@@ -89,16 +93,23 @@ class CVFormatter:
 
         json_output_schema = '''
         {
-            "summary": "A short summary of the role covering company values and desired skills listed in the job posting",
-            "company_name": "The name of the company that posted the job listing",
-            "job_position": "The title of the job posting"
+            "summary": string, // A short summary of the role covering company values and desired skills listed in the job posting
+            "company_name": string, // The name of the company that posted the job listing
+            "job_position": string // The title of the job posting
         }
         '''
-        prompt = f'''The following is a job posting we want to apply to:\n\n
-        {job_posting}\n\n
-        This is a schema of a JSON output containing the job posting summary, company title and job position:\n\n
-        {json_output_schema}\n\n
-        And this is the JSON output for this job posting following the schema above:
+        sample_text = "{\"summary\":\"Company is seeking job pursuing degrees in field or related fields to work on tasks.....\",\"company_name\":\"Company\",\"job_position\":\"Position\"}"
+        prompt = f'''
+        # GENERAL DESCRIPTION
+        This is a job summarizing service that summarizes job applications unstructured plaintext websites. Extract key features such as key applicant qualifications, company values, or anything that is relevant for an applicant writing a CV for this job.\n\n
+        # NLP JOB POSTING PARSER
+        [RAW JOB POSTING PLAINTEXT]
+        {job_posting}
+        [JSON COMPATIBLE TYPESCRIPT TYPE]
+        {json_output_schema}
+        [UNRELATED SAMPLE OUTPUT]
+        {sample_text}
+        [PARSED MINIFIED OUTPUT]
         '''
         response = openai.Completion.create(
             model="text-davinci-003",
@@ -110,14 +121,13 @@ class CVFormatter:
         output = remove_newlines(output)  # Get rid of newlines for valid JSON
 
         try:
-            # assert validate_schema(json_output_schema, output)  # Validate JSON according to desired output schema 
+            # assert validate_schema(json_output_schema, output)  # Validate JSON according to desired output schema
 
             return output
         except AssertionError:
             print("GPT sucks at JSON ffs")
         except Exception as e:
             print(f"Something else fucked up: {e}")
-
 
     @staticmethod
     def format_metadata(cv_file: str) -> str:
@@ -144,7 +154,7 @@ class CVFormatter:
                      {metadata_schema}\n\n
                      This is a JSON object containing metadata following the schema above:
                   '''
-        
+
         response = openai.Completion.create(
             model="text-davinci-003",
             prompt=prompt,
@@ -155,7 +165,6 @@ class CVFormatter:
         output = remove_newlines(output)  # Get rid of newlines for valid JSON
 
         return output
-
 
     @staticmethod
     def format_cv_file(cv_file: str) -> dict:
@@ -170,33 +179,7 @@ class CVFormatter:
         """
 
         schema_cv_json = '''
-        [
-            {
-                "type": "div",
-                "content": [
-                    "p": "Applicant Name",
-                    "p": "Applicant Email",
-                    "p": "Applicant Address",
-                    "p": "Applicant Phone Number",
-                ]
-            },
-            {
-                "type": "h1",
-                "content": "Heading"
-            },
-            {
-                "type": "div",
-                "content": "This is some body text",
-            },
-            {
-                "type": "h2",
-                "content": "Skills"
-            },
-            {
-                "type": "bullet",
-                "content": ["Skill 1", "Skill 2"]
-            }
-        ]
+        [{"type":"h1","content":"Heading"},{"type":"p","content":"This is some body text,"},{"type":"h2","content":"Skills"},{"type":"p","content":"This is some body text,"},{"type":"bullet","content":["Skill 1","Skill 2"]}] 
         '''
 
         schema_cv_ts = '''
@@ -204,40 +187,11 @@ class CVFormatter:
             type: "bullet" | "p" | "h1" | "h2" | "h3" | "div"
             content: RawCVComponentChildren
         }
-
         export type RawCVComponentChildren = string | ((RawCVComponentObject | string)[])
-
         export type RawCVObject = RawCVComponentObject[]
         '''
 
-        example_desired_output = '''
-        [
-            {
-                "type": "div",
-                "content": [
-                    {
-                        "type": "h2",
-                        "content": "Profile"
-                    },
-                    {
-                        "type": "p",
-                        "content": "This is the applicant's profile"
-                    }
-                ]
-            }
-        ]
-        '''
-
-        prompt = f'''The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}", followed by a list of edits and their justification:\n\n
-                      {cv_file}\n\n
-                      This is the schema for a JSON representation of the CV:\n\n                      
-                      {schema_cv_json}\n\n
-                      The same schema is presented below as it would appear in TypeScript:\n\n
-                      {schema_cv_ts}\n\n
-                      Each section should be a div element with at least a heading and another component. List elements should use the 'bullet' component. For example, a partial desired output could look like this...
-                      {example_desired_output}
-
-                      The following is a JSON object representing the CV using this schema:'''
+        prompt = f'''[TASK]The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}"[CV UNSTRUCTURED]{cv_file}[STRUCTURED FORMAT INFORMATION]Typescript declarations:{schema_cv_ts}The document has been formatted to be as easily readable as possible, and must be minified such that there are no extra whitespaces or newlines like the following:{schema_cv_json}[PARSED JSON]'''
         response = openai.Completion.create(
             model="text-davinci-003",
             prompt=prompt,
@@ -249,11 +203,10 @@ class CVFormatter:
         output = remove_newlines(output)  # Get rid of newlines for valid JSON
 
         try:
-            # assert validate_schema(json_output_schema, output)  # Validate JSON according to desired output schema 
+            # assert validate_schema(json_output_schema, output)  # Validate JSON according to desired output schema
 
             return output
         except AssertionError:
             print("GPT sucks at JSON ffs")
         except Exception as e:
             print(f"Something else fucked up: {e}")
-
