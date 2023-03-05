@@ -3,7 +3,7 @@ import Upload from './components/Upload';
 import { Configuration, DefaultApi } from './api';
 import { APIProvider, useAPI } from './APIProvider';
 import { RawCVComponentObject, RawCVObject } from './components/renderer/CVRenderer';
-import { z } from 'zod';
+import { string, z } from 'zod';
 import { jsonrepair } from 'jsonrepair';
 import { Buffer } from 'buffer';
 
@@ -25,7 +25,7 @@ export type CVs = {
 	[id: string]: ModifiedCVState
 }
 
-export const enhanceResponseSchema = z.object({
+export const enhanceResponseParsedSchema = z.object({
 	"cv": z.any(),
 	"metadata": z.object({
 		"job_posting_title": z.string(),
@@ -34,6 +34,10 @@ export const enhanceResponseSchema = z.object({
 			z.string()
 		)
 	})
+})
+
+export const enhanceErrorResponseSchema = z.object({
+	"err": z.string()
 })
 
 export function useCVs() {
@@ -117,43 +121,62 @@ export function useCVs() {
 			const rawResponse = await api.enhanceCvEnhancePost(request)
 			// const rawResponse = await api.getDummyRenderDummyGet()
 			console.log(rawResponse)
-			const response = {
-				cv: (rawResponse as any).data.cv,
-				metadata: (rawResponse as any).data.metadata
-			}
-			// Let's check against the schema
-			console.log(
-				response
-			)
-
-      // Repair JSON for both CV and metadata
-      const repairedResponse = {
-        cv: JSON.parse(jsonrepair(Buffer.from(response.cv, 'utf-8').toString().trim())),
-        metadata: JSON.parse(jsonrepair(Buffer.from(response.metadata, 'utf-8').toString().trim()))
-      }
-
-			const parsedResponse = enhanceResponseSchema.parse(repairedResponse)
-			console.log(parsedResponse)
-			setCvs((cvs: CVs) => {
-				if (cvs[id]) {
-					return {
-						...cvs,
-						[id]: {
-							...cvs[id],
-							processedState: "processed",
-							results: {
-								company: parsedResponse.metadata.company_name,
-								jobTitle: parsedResponse.metadata.job_posting_title,
-								modifiedCV: parsedResponse.cv as RawCVObject,
-								edits: parsedResponse.metadata.edits
+			const isError = enhanceErrorResponseSchema.safeParse(rawResponse.data)
+			if (isError.success) {
+				console.warn("Server encountered error:", isError.data.err as string)
+				setCvs((cvs: CVs)=>{
+					if (cvs[id]) {
+						return {
+							...cvs,
+							[id]: {
+								...cvs[id],
+								processedState: "error",
+								error: isError.data.err
 							}
 						}
+					} else {
+						return cvs
 					}
-				} else {
-					return cvs;
+				})
+			} else {
+				const response = {
+					cv: (rawResponse as any).data.cv,
+					metadata: (rawResponse as any).data.metadata
 				}
-			})
-			console.log(response);
+				// Let's check against the schema
+				console.log(
+					response
+				)
+	
+				// Repair JSON for both CV and metadata
+				const repairedResponse = {
+					cv: JSON.parse(jsonrepair(Buffer.from(response.cv, 'utf-8').toString().trim())),
+					metadata: JSON.parse(jsonrepair(Buffer.from(response.metadata, 'utf-8').toString().trim()))
+				}
+	
+				const parsedResponse = enhanceResponseParsedSchema.parse(repairedResponse)
+				console.log(parsedResponse)
+				setCvs((cvs: CVs) => {
+					if (cvs[id]) {
+						return {
+							...cvs,
+							[id]: {
+								...cvs[id],
+								processedState: "processed",
+								results: {
+									company: parsedResponse.metadata.company_name,
+									jobTitle: parsedResponse.metadata.job_posting_title,
+									modifiedCV: parsedResponse.cv as RawCVObject,
+									edits: parsedResponse.metadata.edits
+								}
+							}
+						}
+					} else {
+						return cvs;
+					}
+				})
+				console.log(response);
+			}
 		}
 	}, [api, originalCVHash]);
 
