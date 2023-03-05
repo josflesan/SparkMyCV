@@ -140,7 +140,7 @@ function Job({ cv, id }: { cv: ModifiedCVState, id: string }) {
             {
                 ((cv.results !== null) && showInspect) ? (
                     <div className="p-2">
-                        {/* {
+                        {
                             cv.results.edits.map((edit, index) => (
                                 <div key={index} className="flex flex-row">
                                     <div className="pr-4">•</div>
@@ -149,9 +149,6 @@ function Job({ cv, id }: { cv: ModifiedCVState, id: string }) {
                                     </div>
                                 </div>
                             ))
-                        } */}
-                        {
-                            
                         }
                     </div>
                 ) : null

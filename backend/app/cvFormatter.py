@@ -149,7 +149,7 @@ class CVFormatter:
             "edits": ["Edit 1 made to the CV", "Edit 2 made to the CV"]
         }
         '''
-        prompt = f'''The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}", and in a seperate section, list of edits and their justification:\n\n
+        prompt = f'''The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}", and afterwards write list of edits and their justification:\n\n
                      {cv_file}\n\n
                      This is the schema for a JSON representation of the metadata for the job posting:\n\n
                      {metadata_schema}\n\n
