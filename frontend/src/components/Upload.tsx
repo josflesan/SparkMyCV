@@ -94,31 +94,6 @@ function JobURLPrompt() {
 }
 
 function Job({ cv }: { cv: ModifiedCVState }) {
-    // if (cv.processedState === "processing") {
-    //     return <div className="px-2">
-    //         <GrInProgress className="inline"/>
-    //         {" " + cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1)}
-    //     </div>
-    // }
-    // else if (cv.processedState === "error") {
-    //     return <div className="px-2 text-red-700">
-    //         <BiErrorAlt className="inline"/>
-    //         {" " + cv.processedState.charAt(0).toUpperCase() + cv.processedState.slice(1)}
-    //     </div>
-    // }
-    // else {
-    //     return 
-    //     <>
-    //         <div className="px-2 inline text-green-700">
-    //             <AiOutlineCheck className="inline"/>
-    //             {" Job position: " + cv.results?.company}
-    //         </div>
-    //         <PDFViewer>
-    //             <CVDocument content={cv.results?.modifiedCV}/>
-    //         </PDFViewer>
-    //     </>
-    // }
-    // Rewrite with one render with ? : syntax
     return (
         <div className="flex flex-row gap-4">
             <div className="flex-grow">
@@ -140,9 +115,10 @@ function Job({ cv }: { cv: ModifiedCVState }) {
                                     <AiOutlineCheck className="inline"/>
                                     {" Job position: " + cv.results?.company}
                                 </div>
-                                {/* <PDFViewer>
+                                {(cv.results !== null) ?
+                                (<PDFViewer>
                                     <CVDocument content={cv.results?.modifiedCV}/>
-                                </PDFViewer> */}
+                                </PDFViewer>) : null}
                             </>
                         )
                     )
@@ -175,7 +151,7 @@ export default function Upload() {
                     }
                 </div>
                 <JobURLPrompt />
-                <PDFViewer className="h-[1000px]">
+                {/* <PDFViewer className="h-[1000px]">
                     <CVDocument content={
                         [
                             {
@@ -192,7 +168,7 @@ export default function Upload() {
                             }
                         ]
                     }/>
-                </PDFViewer>
+                </PDFViewer> */}
             </div>
         </>
     )

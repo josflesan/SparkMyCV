@@ -2,11 +2,13 @@ import { createContext, useCallback, useRef, useState } from 'react'
 import Upload from './components/Upload';
 import { Configuration, DefaultApi } from './api';
 import { APIProvider, useAPI } from './APIProvider';
+import { RawCVComponentObject, RawCVObject } from './components/renderer/CVRenderer';
+import { z } from 'zod';
 
 export type ModifiedCV = {
     company: string,
     jobTitle: string,
-    modifiedCV: string
+    modifiedCV: RawCVObject
 }
 
 export type ModifiedCVState = {
@@ -19,6 +21,17 @@ export type ModifiedCVState = {
 export type CVs = {
 	[id: number]: ModifiedCVState
 }
+
+export const enhanceResponseSchema = z.object({
+	"cv": z.any(),
+	"metadata": z.object({
+		"job_posting_title": z.string(),
+		"company_name": z.string(),
+		"edits": z.array(
+			z.string()
+		)
+	})
+})
 
 export function useCVs() {
 	// setOriginalCV - set the CV PDF to be processed
@@ -74,11 +87,8 @@ export function useCVs() {
 			console.log(request);
 			// Send request to server, and when it comes back, update the state (if it still exists)
 			const response = await api.enhanceCvEnhancePost(request)
-			// Let's assume it always succeeds.. TODO: handle errors
-			// Throw error if response.data.result is not a string
-			if (typeof (response.data as any)["result"] !== "string") {
-				throw new Error("Invalid response from server");
-			}
+			// Let's check against the schema
+			const parsedResponse = enhanceResponseSchema.parse(response.data)
 			setCvs((cvs: CVs) => {
 				if (cvs[id]) {
 					console.log(response.data)
@@ -90,7 +100,7 @@ export function useCVs() {
 							results: {
 								company: "Not implemented",
 								jobTitle: "Not implemented",
-								modifiedCV: (response.data as any)["result"]
+								modifiedCV: parsedResponse.cv as RawCVObject
 							}
 						}
 					}
