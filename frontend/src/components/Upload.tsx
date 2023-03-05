@@ -116,7 +116,7 @@ function Job({ cv }: { cv: ModifiedCVState }) {
                                     {" Job position: " + cv.results?.company}
                                 </div>
                                 {(cv.results !== null) ?
-                                (<PDFViewer>
+                                (<PDFViewer className="h-[1000px]">
                                     <CVDocument content={cv.results?.modifiedCV}/>
                                 </PDFViewer>) : null}
                             </>

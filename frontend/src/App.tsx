@@ -88,7 +88,10 @@ export function useCVs() {
 			// Send request to server, and when it comes back, update the state (if it still exists)
 			const response = await api.enhanceCvEnhancePost(request)
 			// Let's check against the schema
-			const parsedResponse = enhanceResponseSchema.parse(response.data)
+			console.log(
+				response
+			)
+			const parsedResponse = enhanceResponseSchema.parse(JSON.parse((response.data as any)?.result))
 			setCvs((cvs: CVs) => {
 				if (cvs[id]) {
 					console.log(response.data)
