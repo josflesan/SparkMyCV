@@ -102,8 +102,8 @@ async def enhance_cv(data: EnhanceBody) -> dict:
     formattedCV = CVFormatter.format_cv_file(outputCV)
     formattedMetdata = CVFormatter.format_metadata(outputCV)
 
-    return {"cv": json.loads(formattedCV),
-            "metadata": json.loads(formattedMetdata)}
+    return {"cv": formattedCV,
+            "metadata": formattedMetdata}
 
 def custom_openapi():
     """
