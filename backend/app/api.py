@@ -92,15 +92,12 @@ async def enhance_cv(data: EnhanceBody) -> dict:
     pdf_pages = file_store[data.file_hash]
 
     # Preprocess the CV
-    openAIOut = CVFormatter.process_cv(pdf_pages, data.job_posting_url)
-    outputCV = openAIOut['choices'][0]['message']["content"]
-
-    return {"result": outputCV}
+    outputCV = CVFormatter.process_cv(pdf_pages, data.job_posting_url)
 
     # Format CV into JSON output for rendering
-    # formattedCV = CVFormatter.format_cv_file(preprocessedCV)
+    formattedCV = CVFormatter.format_cv_file(outputCV)
 
-    # return formattedCV
+    return {"result": formattedCV}
 
 def custom_openapi():
     """
