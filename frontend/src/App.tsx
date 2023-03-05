@@ -225,12 +225,23 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
 	)
 }
 
+function Footer() {
+	return (
+		<>
+		<div className='mt-auto text-right text-[1rem] '>
+			Made with 🪦 from BudgetGPT © 2023
+		</div>
+		</>
+	)
+}
+
 function App() {
 	return (
 		<APIProvider url='http://localhost:8020'>
 			<AppContextProvider>
-				<div className='flex flex-col gap-8 w-[800px] m-10'>
+				<div className='flex flex-col w-[900px] gap-8 p-12 h-[calc(100vh)]'>
 					<Upload/>
+					<Footer/>
 				</div>
 			</AppContextProvider>
 		</APIProvider>

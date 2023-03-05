@@ -9,6 +9,7 @@
 body {
     display: flex;
     justify-content: center;
+    background-color: rgb(255,235,215);
 }
 
 div {
@@ -29,4 +30,25 @@ h2 {
 
 .hover-border {
     @apply outline outline-1 hover:outline-4 transition-[outline];
+}
+
+input {
+    background: transparent;
+}
+
+input::placeholder {
+    color: black;
+    opacity: 0.5;
+}
+
+button:focus {
+    outline: none;
+}
+
+input:focus {
+    outline: none;
+}
+
+#root {
+    height: 100%;
 }
