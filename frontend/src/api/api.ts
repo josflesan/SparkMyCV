@@ -165,6 +165,36 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * Method that returns dummy JSON data to test rendering.  Returns:     response (dict): JSON representing dummy API responses
+         * @summary Get Dummy Render
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDummyRenderDummyGet: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dummy`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Method that gets CV file as a pdf/text file and stores it in server\'s memory.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt  Returns:     response (str): JSON string output containing the file hash
          * @summary Upload File
          * @param {File} cvFile 
@@ -238,6 +268,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Method that returns dummy JSON data to test rendering.  Returns:     response (dict): JSON representing dummy API responses
+         * @summary Get Dummy Render
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getDummyRenderDummyGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDummyRenderDummyGet(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Method that gets CV file as a pdf/text file and stores it in server\'s memory.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt  Returns:     response (str): JSON string output containing the file hash
          * @summary Upload File
          * @param {File} cvFile 
@@ -277,6 +317,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         enhanceCvEnhancePost(enhanceBody: EnhanceBody, options?: any): AxiosPromise<object> {
             return localVarFp.enhanceCvEnhancePost(enhanceBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Method that returns dummy JSON data to test rendering.  Returns:     response (dict): JSON representing dummy API responses
+         * @summary Get Dummy Render
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDummyRenderDummyGet(options?: any): AxiosPromise<object> {
+            return localVarFp.getDummyRenderDummyGet(options).then((request) => request(axios, basePath));
         },
         /**
          * Method that gets CV file as a pdf/text file and stores it in server\'s memory.  Parameters:     cv_file (UploadFile): A CV file as a PDF/.txt  Returns:     response (str): JSON string output containing the file hash
@@ -320,6 +369,17 @@ export class DefaultApi extends BaseAPI {
      */
     public enhanceCvEnhancePost(enhanceBody: EnhanceBody, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).enhanceCvEnhancePost(enhanceBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Method that returns dummy JSON data to test rendering.  Returns:     response (dict): JSON representing dummy API responses
+     * @summary Get Dummy Render
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getDummyRenderDummyGet(options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getDummyRenderDummyGet(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

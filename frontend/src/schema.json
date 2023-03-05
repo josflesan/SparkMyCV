@@ -6,6 +6,26 @@
         "version": "0.1.0"
     },
     "paths": {
+        "/dummy": {
+            "get": {
+                "summary": "Get Dummy Render",
+                "description": "Method that returns dummy JSON data to test rendering.\n\nReturns:\n    response (dict): JSON representing dummy API responses",
+                "operationId": "get_dummy_render_dummy_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Response Get Dummy Render Dummy Get",
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/upload": {
             "post": {
                 "summary": "Upload File",

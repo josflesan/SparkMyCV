@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@react-pdf/renderer": "^3.1.6",
+    "@types/parse-json": "^4.0.0",
+    "parse-json": "^6.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zod": "^3.21.0"

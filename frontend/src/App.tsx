@@ -86,24 +86,29 @@ export function useCVs() {
 			}
 			console.log(request);
 			// Send request to server, and when it comes back, update the state (if it still exists)
-			const response = await api.enhanceCvEnhancePost(request)
+			// const response = await api.enhanceCvEnhancePost(request)
+			const rawResponse = await api.getDummyRenderDummyGet()
+			console.log(rawResponse)
+			const response = {
+				cv: JSON.parse((rawResponse as any).data.cv.trim()),
+				metadata: JSON.parse((rawResponse as any).data.metadata.trim())
+			}
 			// Let's check against the schema
 			console.log(
 				response
 			)
-			const parsedResponse = enhanceResponseSchema.parse(JSON.parse((response.data as any)?.cv))
+			const parsedResponse = enhanceResponseSchema.parse(response)
 			console.log(parsedResponse)
 			setCvs((cvs: CVs) => {
 				if (cvs[id]) {
-					console.log(response.data)
 					return {
 						...cvs,
 						[id]: {
 							...cvs[id],
 							processedState: "processed",
 							results: {
-								company: "Not implemented",
-								jobTitle: "Not implemented",
+								company: parsedResponse.metadata.company_name,
+								jobTitle: parsedResponse.metadata.job_posting_title,
 								modifiedCV: parsedResponse.cv as RawCVObject
 							}
 						}

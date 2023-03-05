@@ -36,6 +36,14 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginBottom: 10,
     },
+    row:{
+        display: 'flex',
+        flexDirection: 'row'
+    },
+    bullet:{
+        height: '100%',
+        flexWrap: "nowrap"
+    }
 });
 
 function renderChildren(children: RawCVComponentChildren, parentType: RawCVComponentObject["type"]) {
@@ -54,12 +62,25 @@ function renderChildren(children: RawCVComponentChildren, parentType: RawCVCompo
         })
 }}
 
+export function BulletItem({ children }: {children: string}) {
+    return (
+        <View style={styles.row} wrap={false}>
+            <View style={styles.bullet} wrap={false}>
+                <Text>{'\u2022' + " "}</Text>
+            </View>
+            <Text>{children}</Text>
+        </View>
+    )
+}
+
 export function BulletRenderer({ content }: WithType<RawCVComponentObject, "bullet">) {
     const children = renderChildren(content, "bullet")
     return (
         <Text style={styles.paragraph}>
             {
-                (typeof children==="string") ? `- ${children}` : children
+                (typeof children==="string") ? <BulletItem>
+                    {children}
+                </BulletItem> : children
             }
         </Text>
     )
