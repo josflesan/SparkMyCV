@@ -5,12 +5,29 @@ OpenAI interface to make calls to the API with appropriate headers
 from typing import List
 from dotenv import load_dotenv
 from .webscraper import WebScraper
+from .validate_schema import validate_schema
 import os
 import openai
 import json
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
+
+def remove_newlines(string):
+    in_quotes = False
+    new_string = ""
+    for char in string:
+        if char == '"' and not in_quotes:
+            in_quotes = True
+            new_string += char
+        elif char == '"' and in_quotes:
+            in_quotes = False
+            new_string += char
+        elif char == '\n' and not in_quotes:
+            continue
+        else:
+            new_string += char
+    return new_string
 
 class CVFormatter:
 
@@ -87,7 +104,15 @@ class CVFormatter:
             max_tokens=250
         )
 
-        return response['choices'][0]['text']
+        output = response["choices"][0]["text"]
+        output = remove_newlines(output)  # Get rid of newlines for valid JSON
+
+        try:
+            assert validate_schema(json_output_schema, output)  # Validate JSON according to desired output schema 
+
+            return output
+        except AssertionError:
+            print("GPT sucks at JSON ffs")
 
 
     @staticmethod
@@ -142,6 +167,45 @@ class CVFormatter:
             prompt=prompt,
             max_tokens=2110
         )
+
+        json_output_schema ={
+            "cv": [
+                [
+                    {
+                        "type": "div",
+                        "content": "Applicant Name\nApplicant contacts"
+                    },
+                    {
+                        "type": "h1",
+                        "content": "Heading"
+                    },
+                    {
+                        "type": "div",
+                        "content": "This is some body text"
+                    },
+                    {
+                        "type": "h2",
+                        "content": "Skills"
+                    },
+                    {
+                        "type": "bullet",
+                        "content": "Skill 1\nSkill 2"
+                    }
+                ]
+            ],
+            "metadata": {
+                "job_posting": "Job Posting Title",
+                "company": "Company Name",
+                "edits": ["Edit 1", "Edit 2"]
+            }
+        }
+        output = response['choices'][0]['text']
+        output = remove_newlines(output)  # Get rid of newlines for valid JSON
+
+        try:
+            assert validate_schema(json_output_schema, output)  # Validate JSON according to desired output schema 
+        except AssertionError:
+            print("GPT sucks at JSON ffs")
 
         return {"response": response['choices'][0]['text']}
 
