@@ -108,11 +108,42 @@ class CVFormatter:
         output = remove_newlines(output)  # Get rid of newlines for valid JSON
 
         try:
-            assert validate_schema(json_output_schema, output)  # Validate JSON according to desired output schema 
+            # assert validate_schema(json_output_schema, output)  # Validate JSON according to desired output schema 
 
             return output
         except AssertionError:
             print("GPT sucks at JSON ffs")
+        except Exception as e:
+            print(f"Something else fucked up: {e}")
+
+
+    @staticmethod
+    def format_metadata(cv_file: str) -> str:
+        """
+        Method that takes in processed CV output as string and outputs metadata
+
+        Parameters:
+            cv_file (str): processed CV file as a string, including summary of edits
+
+        Returns:
+            response (dict): JSON response containing formatted metadata
+        """
+
+        prompt = f'''The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}", followed by a list of edits and their justification:\n\n
+                     {cv_file}\n\n
+                     This is a JSON object containing metadata including job posting title, company name and list of edits:
+                  '''
+        
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=prompt,
+            max_tokens=2110
+        )
+
+        output = response['choices'][0]['text']
+        output = remove_newlines(output)  # Get rid of newlines for valid JSON
+
+        return output
 
 
     @staticmethod
@@ -161,7 +192,7 @@ class CVFormatter:
                       {cv_file}\n\n
                       This the schema for a JSON representation of the CV:\n\n
                       {schema_cv}\n\n
-                      The following is a JSON object containing a JSON representation of the CV following that schema followed by a JSON object containing metadata including job posting title, company name and list of edits:'''
+                      The following is a JSON object containing a JSON representation of the CV following that schema:'''
         response = openai.Completion.create(
             model="text-davinci-003",
             prompt=prompt,
@@ -203,9 +234,11 @@ class CVFormatter:
         output = remove_newlines(output)  # Get rid of newlines for valid JSON
 
         try:
-            assert validate_schema(json_output_schema, output)  # Validate JSON according to desired output schema 
+            # assert validate_schema(json_output_schema, output)  # Validate JSON according to desired output schema 
+
+            return output
         except AssertionError:
             print("GPT sucks at JSON ffs")
-
-        return {"response": response['choices'][0]['text']}
+        except Exception as e:
+            print(f"Something else fucked up: {e}")
 

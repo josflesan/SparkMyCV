@@ -7,6 +7,7 @@ from PyPDF2 import PdfReader
 from pydantic import BaseModel
 import hashlib
 import json
+import functools
 
 app = FastAPI()
 
@@ -25,6 +26,7 @@ app.add_middleware(
         allow_headers=["*"]
 )
 
+@functools.cache
 @app.post("/upload")
 async def upload_file(cv_file: UploadFile) -> dict:
     """
@@ -60,6 +62,7 @@ async def upload_file(cv_file: UploadFile) -> dict:
 
     return {"response": "File uploaded correctly", "file_hash": filename_hash}
 
+@functools.cache
 @app.get("/file/{file_hash}")
 async def check_file_exists(file_hash: str) -> dict:
     """
@@ -74,6 +77,7 @@ async def check_file_exists(file_hash: str) -> dict:
     """
     return {"response": file_hash in file_store}
 
+@functools.cache
 @app.post("/enhance")
 async def enhance_cv(data: EnhanceBody) -> dict:
     """
@@ -96,8 +100,10 @@ async def enhance_cv(data: EnhanceBody) -> dict:
 
     # Format CV into JSON output for rendering
     formattedCV = CVFormatter.format_cv_file(outputCV)
+    formattedMetdata = CVFormatter.format_metadata(outputCV)
 
-    return {"result": formattedCV}
+    return {"cv": json.loads(formattedCV),
+            "metadata": json.loads(formattedMetdata)}
 
 def custom_openapi():
     """

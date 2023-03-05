@@ -17,6 +17,8 @@ dependencies = [
     "cloudscraper>=1.2.69",
     "beautifulsoup4>=4.11.2",
     "python-multipart>=0.0.6",
+    "jsonschema>=4.17.3",
+    "genson>=1.2.2"
 ]
 requires-python = ">=3.10"
 readme = "README.md"
