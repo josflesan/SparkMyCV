@@ -69,6 +69,8 @@ class CVFormatter:
             max_tokens=1417
         )
 
+        print(response["choices"][0]["text"])
+
         return response["choices"][0]["text"]
 
     @staticmethod
@@ -159,72 +161,28 @@ class CVFormatter:
         """
 
         schema_cv = '''
-        [
-            {
-                "type": "div",
-                "content": ["Applicant name", "Applicant contacts"]
-            },
-            {
-                "type": "h1",
-                "content": "Heading"
-            },
-            {
-                "type": "div",
-                "content": "This is some body text",
-            },
-            {
-                "type": "h2",
-                "content": "Skills"
-            },
-            {
-                "type": "bullet",
-                "content": ["Point 1", "Point 2"]
-            }
-        ]       
+        export type RawCVComponentObject = {
+            type: "bullet" | "p" | "h1" | "h2" | "h3" | "div"
+            content: RawCVComponentChildren
+        }
+
+        export type RawCVComponentChildren = string | ((RawCVComponentObject|string)[])
+        export type RawCVObject = RawCVComponentObject[]
+
+        The following is a valid JSON object representing the CV following this schema:
         '''
 
         prompt = f'''The following is a CV tailored for a job posting titled "{CVFormatter.CURRENT_JOB_POSITION}" for company "{CVFormatter.CURRENT_COMPANY_NAME}", followed by a list of edits and their justification:\n\n
                       {cv_file}\n\n
-                      This the schema for a JSON representation of the CV:\n\n
+                      This is the schema for a JSON representation of the CV in TypeScript:\n\n                      
                       {schema_cv}\n\n
-                      The following is a JSON object containing a JSON representation of the CV following that schema:'''
+                      The following is a JSON object representing the CV using this schema:'''
         response = openai.Completion.create(
             model="text-davinci-003",
             prompt=prompt,
-            max_tokens=2110
+            max_tokens=2048
         )
 
-        json_output_schema ={
-            "cv": [
-                [
-                    {
-                        "type": "div",
-                        "content": ["Applicant Name", "Applicant contacts"]
-                    },
-                    {
-                        "type": "h1",
-                        "content": "Heading"
-                    },
-                    {
-                        "type": "div",
-                        "content": "This is some body text"
-                    },
-                    {
-                        "type": "h2",
-                        "content": "Skills"
-                    },
-                    {
-                        "type": "bullet",
-                        "content": ["Skill 1", "Skill 2"]
-                    }
-                ]
-            ],
-            "metadata": {
-                "job_posting": "Job Posting Title",
-                "company": "Company Name",
-                "edits": ["Edit 1", "Edit 2"]
-            }
-        }
         output = response['choices'][0]['text']
         print(f"Raw Output String: {output}")
         output = remove_newlines(output)  # Get rid of newlines for valid JSON
