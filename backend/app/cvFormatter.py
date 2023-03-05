@@ -106,12 +106,7 @@ class CVFormatter:
         [
             {
                 "type": "div",
-                "content": [
-                    "p": "Applicant Name",
-                    "p": "Applicant Email",
-                    "p": "Applicant Address",
-                    "p": "Applicant Phone Number",
-                ]
+                "content": "Applicant name\nApplicant contacts"
             },
             {
                 "type": "h1",
@@ -127,7 +122,7 @@ class CVFormatter:
             },
             {
                 "type": "bullet",
-                "content": "String representing list of skills separated by newline characters"
+                "content": "Point 1\nPoint 2"
             }
         ]       
         '''
