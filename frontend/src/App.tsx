@@ -91,7 +91,7 @@ export function useCVs() {
 			console.log(
 				response
 			)
-			const parsedResponse = enhanceResponseSchema.parse(JSON.parse((response.data as any)?.result))
+			const parsedResponse = enhanceResponseSchema.parse(JSON.parse((response.data as any)?.cv))
 			console.log(parsedResponse)
 			setCvs((cvs: CVs) => {
 				if (cvs[id]) {

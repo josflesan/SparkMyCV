@@ -1,12 +1,12 @@
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { render } from 'react-dom';
 
 export type RawCVComponentObject = {
     type: "bullet" | "p" | "h1" | "h2" | "h3" | "div"
     content: RawCVComponentChildren
 }
-// For bullet points, schema expects string with newline for seperating into bullet points
 
-export type RawCVComponentChildren = string | (RawCVComponentObject[])
+export type RawCVComponentChildren = string | ((RawCVComponentObject|string)[])
 
 export type WithType<T, U> = T & { type: U }
 
@@ -38,24 +38,28 @@ const styles = StyleSheet.create({
     },
 });
 
-function renderChildren(children: RawCVComponentChildren) {
+function renderChildren(children: RawCVComponentChildren, parentType: RawCVComponentObject["type"]) {
     if (typeof children === "string") {
         return children;
     } else {
-        return children.map((child, index) => <CVRendererAssigner key={index} cv={child} />)
-    }
-}
+        return children.map((child, index) => {
+            if (typeof child === "string") {
+                return <CVRendererAssigner key={index} cv={{
+                    type: parentType,
+                    content: child
+                }}/>
+            } else {
+                return <CVRendererAssigner key={index} cv={child}/>
+            }
+        })
+}}
 
 export function BulletRenderer({ content }: WithType<RawCVComponentObject, "bullet">) {
+    const children = renderChildren(content, "bullet")
     return (
         <Text style={styles.paragraph}>
             {
-                Array.isArray(content) ? content.map((child, index) => <CVRendererAssigner key={index} cv={child} />) : (
-                    // Split on newlines
-                    content.split("\n").map((point: string, index)=>(
-                        <Text key={index}>{`• ${point}\n`}</Text>
-                    ))
-                )
+                (typeof children==="string") ? `- ${children}` : children
             }
         </Text>
     )
@@ -64,7 +68,7 @@ export function BulletRenderer({ content }: WithType<RawCVComponentObject, "bull
 export function PRenderer({ content }: WithType<RawCVComponentObject, "p">) {
     return (
         <Text style={styles.paragraph}>
-            {renderChildren(content)}
+            {renderChildren(content, "p")}
         </Text>
     )
 }
@@ -72,7 +76,7 @@ export function PRenderer({ content }: WithType<RawCVComponentObject, "p">) {
 export function H1Renderer({ content }: WithType<RawCVComponentObject, "h1">) {
     return (
         <Text style={styles.header}>
-            {renderChildren(content)}
+            {renderChildren(content, "h1")}
         </Text>
     )
 }
@@ -80,7 +84,7 @@ export function H1Renderer({ content }: WithType<RawCVComponentObject, "h1">) {
 export function H2Renderer({ content }: WithType<RawCVComponentObject, "h2">) {
     return (
         <Text style={styles.subheader}>
-            {renderChildren(content)}
+            {renderChildren(content, "h2")}
         </Text>
     )
 }
@@ -88,7 +92,7 @@ export function H2Renderer({ content }: WithType<RawCVComponentObject, "h2">) {
 export function H3Renderer({ content }: WithType<RawCVComponentObject, "h3">) {
     return (
         <Text style={styles.subsubheader}>
-            {renderChildren(content)}
+            {renderChildren(content, "h3")}
         </Text>
     )
 }
