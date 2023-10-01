@@ -1,6 +1,6 @@
-### An Amazing Project
+### SparkMyCV
 
-This is going to be an amazing project for HTB IX.
+An online GPT-3 powered tool to tailor and format CV to job posting. Recipient of an Entrepreneurship Award at Hack the Burgh IX hackathon
 
 ## 1. Setup
 
